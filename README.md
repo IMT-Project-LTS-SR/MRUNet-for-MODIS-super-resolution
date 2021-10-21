@@ -1,4 +1,5 @@
 # BulidDatabase
+Hello guys! For the temporary code/notebook, I hope you can put them in **Dirty_code** folder, and for the **cleaned up** code, you can put it in the root folder directly.
 
 ## Metrics
 https://cvnote.ddlee.cc/2019/09/12/psnr-ssim-python
