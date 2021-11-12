@@ -1,0 +1,1 @@
+About the mode x4, when you load the model, remember to add an argument: model = Unet(bilinear = 0) in order to change the layer upsample to conv2dTrans
