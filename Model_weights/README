@@ -1,3 +1,2 @@
 About the model x4 and x2, when you load the model, remember to add an argument: model = UNet(bilinear=0).to(device) in order to change the layer upsample to conv2dTrans.
-About the model input and output, before feeding an image into the model, you need to normalize it by: image = image/324.260009765625. The model output needs to multiply with the same 
-number 324.260009765625: output = output*324.260009765625.
+About the model input and output, before feeding an image into the model, you need to normalize it by: image = image/324.260009765625. The model output needs to multiply with the same number 324.260009765625: output = output*324.260009765625.
