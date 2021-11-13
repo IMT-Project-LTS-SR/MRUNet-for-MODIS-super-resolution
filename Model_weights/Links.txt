@@ -1,2 +1,2 @@
 1. Model Unet x4 with skip: https://drive.google.com/file/d/1qdPoecsGya_aENkIttcQqqmesdg3F8c1/view?usp=sharing
-2. Model Unet x2 with skip: https://drive.google.com/file/d/1pTnTWrNfVVuw5IlDaYP-yN-uJmPLFFNT/view?usp=sharing
+2. Model Unet x2 (the best model so far) with skip: https://drive.google.com/file/d/1pTnTWrNfVVuw5IlDaYP-yN-uJmPLFFNT/view?usp=sharing
