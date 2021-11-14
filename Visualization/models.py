@@ -1,4 +1,3 @@
-
 from __future__ import absolute_import, division, print_function
 
 import numpy as np
@@ -8,9 +7,110 @@ import torch.nn as nn
 import torchvision.models as models
 import torch.utils.model_zoo as model_zoo
 from collections import OrderedDict
-import os
-import time
 import torch.nn.functional as F
+
+from utils import *
+###############################################
+from unet_parts import *
+
+class UNet(nn.Module):
+    def __init__(self, n_channels=1, n_classes=1, bilinear=True):
+        super(UNet, self).__init__()
+        self.n_channels = n_channels
+        self.n_classes = n_classes
+        self.bilinear = bilinear
+
+        self.inc = DoubleConv(n_channels, 64)
+        self.down1 = Down(64, 128)
+        self.down2 = Down(128, 256)
+        self.down3 = Down(256, 512)
+        factor = 2 if bilinear else 1
+        self.down4 = Down(512, 1024 // factor)
+        self.up1 = Up(1024, 512 // factor, bilinear)
+        self.up2 = Up(512, 256 // factor, bilinear)
+        self.up3 = Up(256, 128 // factor, bilinear)
+        self.up4 = Up(128, 64, bilinear)
+        self.outc = OutConv(64, n_classes)
+        # self.up = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True)
+        self.up = nn.ConvTranspose2d(64, 64, kernel_size=2, stride=2)
+        self.up_dc = DoubleConv(64, 64)
+
+        # NDVI 
+        self.ndvi_inc = DoubleConv(n_channels, 64)
+        self.ndvi_down1 = Down(64, 128)
+        self.ndvi_down2 = Down(128, 256)
+        self.ndvi_down3 = Down(256, 512)
+        factor = 2 if bilinear else 1
+        self.ndvi_down4 = Down(512, 1024 // factor)
+        self.ndvi_up1 = Up(1024, 512 // factor, bilinear)
+        self.ndvi_up2 = Up(512, 256 // factor, bilinear)
+        self.ndvi_up3 = Up(256, 128 // factor, bilinear)
+        self.ndvi_up4 = Up(128, 64, bilinear)
+        self.ndvi_outc = OutConv(64, n_classes)
+
+    # def forward(self, x):
+    #     x1 = self.inc(x)
+    #     x2 = self.down1(x1)
+    #     x3 = self.down2(x2)
+    #     x4 = self.down3(x3)
+    #     x5 = self.down4(x4)
+    #     x = self.up1(x5, x4)
+    #     x = self.up2(x, x3)
+    #     x = self.up3(x, x2)
+    #     x = self.up4(x, x1)
+    #     x = self.up(x)
+    #     x = self.up_dc(x)
+    #     logits = self.outc(x)
+    #     return logits
+
+    # def forward(self, x, ndvi):
+    #     x1 = self.inc(x)
+    #     x2 = self.down1(x1)
+    #     x3 = self.down2(x2)
+    #     x4 = self.down3(x3)
+    #     x5 = self.down4(x4)
+    #     x = self.up1(x5, x4)
+    #     x = self.up2(x, x3)
+    #     x = self.up3(x, x2)
+    #     x = self.up4(x, x1)
+    #     x = self.up(x)
+    #     x = self.up_dc(x)
+    #     logits = self.outc(x) + ndvi
+    #     return logits
+
+    def forward(self, x, ndvi):
+        x1 = self.inc(x)
+        x2 = self.down1(x1)
+        x3 = self.down2(x2)
+        x4 = self.down3(x3)
+        x5 = self.down4(x4)
+        x = self.up1(x5, x4)
+        x = self.up2(x, x3)
+        x = self.up3(x, x2)
+        x = self.up4(x, x1)
+        x = self.up(x)
+        x = self.up_dc(x)
+
+
+        ndvi1 = self.ndvi_inc(ndvi)
+        ndvi2 = self.ndvi_down1(ndvi1)
+        ndvi3 = self.ndvi_down2(ndvi2)
+        ndvi4 = self.ndvi_down3(ndvi3)
+        ndvi5 = self.ndvi_down4(ndvi4)
+        ndvi = self.ndvi_up1(ndvi5, ndvi4)
+        ndvi = self.ndvi_up2(ndvi, ndvi3)
+        ndvi = self.ndvi_up3(ndvi, ndvi2)
+        ndvi = self.ndvi_up4(ndvi, ndvi1)
+
+        logits = self.outc(x) + self.ndvi_outc(ndvi)
+        return logits
+
+
+
+
+##############################################################################
+
+
 
 
 def disp_to_depth(disp, min_depth, max_depth):
@@ -370,13 +470,16 @@ class Encoder_Decoder(nn.Module):
         self.decoder = nn.ModuleList(list(self.convs.values()))
         self.sigmoid = nn.Sigmoid()
 
+        self.conv_tmp = nn.Conv2d(1, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
 
 
-    def forward(self, input_image):
+
+    def forward(self, x):
         # Encoder
         # x = (input_image - 0.45) / 0.225                    # torch.Size([512, 64, 32, 32])
         x = self.up(x)
-        x = self.encoder.conv1(x)                           # torch.Size([512, 64, 32,32])
+        # x = self.encoder.conv1(x)                           # torch.Size([512, 64, 32,32])
+        x = self.conv_tmp(x)                                # torch.Size([512, 64, 32,32])
         x = self.encoder.bn1(x)                             # torch.Size([512, 64, 32,32])
 
         x1 = self.encoder.relu(x)                           # torch.Size([512, 64, 32, 32])
@@ -413,8 +516,51 @@ class Encoder_Decoder(nn.Module):
             # torch.Size([512, 32, 32, 32])
         return self.outputs[("disp", 0)]
 
-if __name__ == '__main__':
-    encoder_decoder = Encoder_Decoder(18, False).cuda()
-    # output = encoder_decoder(img)
+#################################################
 
-    
+def ATPRK(ndvi_1km, LST_K_day_1km, ndvi_2km, LST_K_day_2km):
+    #FIT
+    path_index = ndvi_2km
+    path_temperature = LST_K_day_2km
+    #path_index = 'TEST_Thunmpy_08-07-2019/Index/NDBI_080628_100m.dat'
+    #path_temperature = 'TEST_Thunmpy_08-07-2019/Temp/LST_4_bandes_jour_satellite_100m_bruite.bsq'
+    min_T = 270
+    path_fit = 'Fit_NDBI_T.txt'
+    plot =0
+    path_plot = 'tmp_fig/NDBI_vs_T.png'
+
+    linear_fit_test(path_index, path_temperature, min_T, path_fit, plot, path_plot)
+    # index (894, 135)
+    # Temp (894, 135)
+
+    #UNMIXING
+    path_index = ndvi_1km
+    path_temperature = LST_K_day_2km
+    path_fit = 'Fit_NDBI_T.txt'
+    path_out = 'T_unm_1km_from2km_jourNDBI.bsq'
+    iscale=2
+    path_mask=0
+
+    T_unm = linear_unmixing_test(path_index, path_temperature, path_fit, iscale,path_mask, path_out)
+    # index (1787, 269)
+    # Temp (358, 54)
+
+    #CORR
+    path_index = ndvi_2km
+    path_fit = 'Fit_NDBI_T.txt'
+    path_temperature = LST_K_day_2km
+    path_unm = 'T_unm_1km_from2km_jourNDBI.bsq'
+    iscale=2
+    # scc=2
+    scc=32
+    block_size = 3 # 3 
+    sill=7
+    ran=1000
+    path_out='Delta_T_1km_from2km_jour_NDBI_atprk.bsq'
+    path_out1='T_unm_add_1km_from2km_jour_NDBI_atprk.bsq'
+    path_out2='Delta_T_final_1km_from2km_jour_NDBI_atprk.bsq'
+    path_out3='T_unmixed_final_1km_from2km_jour_NDBI_atprk.bsq'
+    path_plot= 'Gamma_c_NDBI_2km.png'
+
+    prediction , Delta_T_final, TT_unm= correction_ATPRK_test(path_index, path_fit, path_temperature, path_unm, iscale, scc, block_size, sill, ran, path_out, path_out1, path_out2, path_out3,path_plot,T_unm)
+    return prediction, LST_K_day_1km, Delta_T_final, TT_unm
