@@ -7,93 +7,7 @@ from osgeo import gdal, gdalconst
 import math
 from scipy.spatial.distance import pdist, squareform
 import scipy.optimize as opt
-from torchvision import transforms
 import torch
-
-
-class NDVI_LST(torch.utils.data.Dataset):
-    """
-    NDVI_LST dataset.
-    refer to: https://pytorch.org/tutorials/beginner/data_loading_tutorial.html
-    """
-    def __init__(self, LST_1km_dir, LST_2km_dir, NDVI_1km_dir, NDVI_2km_dir, LST_1km_files, LST_2km_files, NDVI_1km_files, NDVI_2km_files, LST_to_NDVI_dic,\
-                    root_dir='/content/drive/MyDrive/Ganglin/1_IMT/MCE_Projet3A/MODIS/', use_small=1,transform=None,mean_all=None, std_all=None):
-        """
-        Args:
-            csv_file (string): Path to the csv file with annotations.
-            root_dir (string): Directory with all the images.
-            transform (callable, optional): Optional transform to be applied
-                on a sample.
-            root_dir = '/content/drive/MyDrive/Ganglin/1_IMT/MCE_Projet3A/MODIS/'
-        """
-        
-        # self.root_dir = root_dir
-        # self.transform = transform
-        # self.LST_1km_dir = os.path.join(root_dir,"MOD_2020_MOD11A1/tifs_files/1km")
-        # self.LST_2km_dir = os.path.join(root_dir,"MOD_2020_MOD11A1/tifs_files/2km")
-        # self.NDVI_1km_dir = os.path.join(root_dir,"MOD_2020_MOD13A2/tifs_files/1km")
-        # self.NDVI_2km_dir = os.path.join(root_dir,"MOD_2020_MOD13A2/tifs_files/2km")
-        # self.LST_1km_files = os.listdir(self.LST_1km_dir)
-        # self.LST_2km_files = os.listdir(self.LST_2km_dir)
-        # self.NDVI_1km_files = os.listdir(self.NDVI_1km_dir)
-        # self.NDVI_2km_files = os.listdir(self.NDVI_2km_dir)
-        # self.LST_to_NDVI_dic = np.load(os.path.join(root_dir,"LST_to_NDVI_dic.npy"), allow_pickle=1).item()
-
-        self.LST_1km_dir = LST_1km_dir
-        self.LST_2km_dir = LST_2km_dir
-        self.NDVI_1km_dir = NDVI_1km_dir
-        self.NDVI_2km_dir = NDVI_2km_dir
-        self.LST_1km_files = LST_1km_files
-        self.LST_2km_files = LST_2km_files
-        self.NDVI_1km_files = NDVI_1km_files
-        self.NDVI_2km_files = NDVI_2km_files
-        self.LST_to_NDVI_dic = LST_to_NDVI_dic
-        self.transform = transform
-        if use_small:
-            self.LST_1km_files = self.LST_1km_files[:160]
-
-        if self.transform:
-            self.transform_ndvi_1km = transforms.Compose([transforms.ToTensor(),
-                                                        transforms.Normalize(mean=mean_all["ndvi_1km"], std=std_all["ndvi_1km"])])
-            self.transform_ndvi_2km = transforms.Compose([transforms.ToTensor(),
-                                                        transforms.Normalize(mean=mean_all["ndvi_2km"], std=std_all["ndvi_2km"])])
-            self.transform_LST_K_day_1km = transforms.Compose([transforms.ToTensor(),
-                                                            transforms.Normalize(mean=mean_all["LST_K_day_1km"], std=std_all["LST_K_day_1km"])])
-            self.transform_LST_K_day_2km = transforms.Compose([transforms.ToTensor(),
-                                                            transforms.Normalize(mean=mean_all["LST_K_day_2km"], std=std_all["LST_K_day_2km"])])
-
-
-    def __len__(self):
-        return len(self.LST_1km_files)
-
-    def __getitem__(self, idx):
-        # get lst files
-        lst_file_name = self.LST_1km_files[idx]
-        name_list = lst_file_name.split(".")
-        date = int(name_list[1].strip("A")[-4:])
-        patch_num = name_list[-2]
-
-        # get lst files
-        tifs_1km_path = os.path.join(self.LST_1km_dir, lst_file_name)
-        tifs_2km_path = os.path.join(self.LST_2km_dir, lst_file_name)
-        LST_K_day_1km, LST_K_night_1km, cols_1km, rows_1km, projection_1km, geotransform_1km = read_tif(tifs_1km_path)
-        LST_K_day_2km, LST_K_night_2km, cols_2km, rows_2km, projection_2km, geotransform_2km = read_tif(tifs_2km_path)
-
-        # get ndvi files
-        ndvi_file_name = self.LST_to_NDVI_dic[lst_file_name]
-        ndvi_1km_path = os.path.join(self.NDVI_1km_dir, ndvi_file_name)
-        ndvi_2km_path = os.path.join(self.NDVI_2km_dir, ndvi_file_name)
-        ndvi_1km, ndvi_2km = self.get_ndvi(ndvi_1km_path, ndvi_2km_path)
-        # ndvi_1km = LST_K_day_1km
-        # ndvi_2km = LST_K_day_2km
-        if self.transform:
-            ndvi_1km = self.transform_ndvi_1km(ndvi_1km).squeeze(0)
-            ndvi_2km = self.transform_ndvi_2km(ndvi_2km).squeeze(0)
-            LST_K_day_1km = self.transform_LST_K_day_1km(LST_K_day_1km).squeeze(0)
-            LST_K_day_2km = self.transform_LST_K_day_2km(LST_K_day_2km).squeeze(0)
-
-        return ndvi_1km, LST_K_day_1km, ndvi_2km, LST_K_day_2km
-
 
 def psnr_notorch(label, outputs):
     """
@@ -638,6 +552,17 @@ def correction_ATPRK_test(path_index, path_fit, path_temperature, path_unm, isca
     
     # We obtain the delta at the scale of the unmixed temperature
     Delta_T_final =np.zeros((rows,cols))
+    # for ic in range(b_radius,math.floor(cols/iscale)-b_radius):
+    #     for ir in range(b_radius,math.floor(rows/iscale)-b_radius):
+    #         for ir_2 in range((ir-b_radius)*iscale,(ir+b_radius)*iscale+iscale):
+    #             for ic_2 in range((ic-b_radius)*iscale-2,(ic+b_radius)*iscale+iscale):
+    #                 if mask_TT_unm[ir_2,ic_2]==0:
+    #                     Delta_T_final[ir_2,ic_2] = 0
+    #                 else:
+    #                     temp_var = np.reshape(Delta_T[ir-b_radius:ir+b_radius+1,ic-b_radius:ic+b_radius+1],block_size**2) # We take the block of coarse pixels
+    #                     # We multiply each coarse pixel in the block by the corresponding lambda and sum
+    #                     Delta_T_final[ir_2,ic_2] = np.sum(lambdas[((ir_2-ir*iscale)*iscale+ic_2-ic*iscale)%lambdas.shape[0],:]*temp_var)
+    
     
     for ic in range(b_radius,math.floor(cols/iscale)-b_radius):
         for ir in range(b_radius,math.floor(rows/iscale)-b_radius):
@@ -672,8 +597,98 @@ def correction_ATPRK_test(path_index, path_fit, path_temperature, path_unm, isca
     # plt.figure()
     # plt.imshow(TT_unmixed_corrected)
     # plt.colorbar()
-    plt.savefig("tmp_fig/TT_unmixed_corrected.png")
+    # plt.savefig("tmp_fig/TT_unmixed_corrected.png")
     # print("index",index.shape)
     # print("Temp",Temp.shape)
-    return TT_unmixed_corrected
+    return TT_unmixed_corrected, Delta_T_final, TT_unm
 
+def setup_seed(seed):
+    import random
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    np.random.seed(seed)
+    random.seed(seed)
+    torch.backends.cudnn.deterministic = True
+
+
+
+
+def get_ndvi_and_lst():
+
+    in_file = '/content/drive/MyDrive/Ganglin/1_IMT/MCE_Projet3A/MODIS/MOD_2020_MOD11A1/tifs_files/1km_of_MOD13A2.A2020001.h18v04.061.2020326033640.hdf.0015.tif'
+    red, nir, mir, cols, rows, projection, geotransform = read_tif_MOD13A2(in_file)
+    # NVBI
+    ndbi = (mir - nir) / (mir + nir)
+    # SWIR 
+    ndvi = (nir - red) / (nir + red)
+    # 将NAN转化为0值
+    nan_index = np.isnan(ndvi)
+    ndvi[nan_index] = 0
+    ndvi_1km = ndvi.astype(np.float32)
+
+    nan_index = np.isnan(ndbi)
+    ndbi[nan_index] = 0
+    ndbi_1km = ndbi.astype(np.float32)
+
+    in_file = '/content/drive/MyDrive/Ganglin/1_IMT/MCE_Projet3A/MODIS/MOD_2020_MOD11A1/tifs_files/2km_of_MOD13A2.A2020001.h18v04.061.2020326033640.hdf.0015.tif'
+    red, nir, mir, cols, rows, projection, geotransform = read_tif_MOD13A2(in_file)
+    # NDBI
+    ndbi = (mir - nir) / (mir + nir)
+    # NDVI 
+    ndvi = (nir - red) / (nir + red)
+    # Convert Nan to 0
+    nan_index = np.isnan(ndvi)
+    ndvi[nan_index] = 0
+    ndvi_2km = ndvi.astype(np.float32)
+
+    nan_index = np.isnan(ndbi)
+    ndbi[nan_index] = 0
+    ndbi_2km = ndbi.astype(np.float32)
+
+    #
+    tifs_1km_path = '/content/drive/MyDrive/Ganglin/1_IMT/MCE_Projet3A/MODIS/MOD_2020_MOD11A1/tifs_files/1km_of_MOD11A1.A2020001.h18v04.061.2021003092415.hdf.0015.tif'
+    tifs_2km_path = '/content/drive/MyDrive/Ganglin/1_IMT/MCE_Projet3A/MODIS/MOD_2020_MOD11A1/tifs_files/2km_of_MOD11A1.A2020001.h18v04.061.2021003092415.hdf.0015.tif'
+    LST_K_day_1km, LST_K_night_1km, cols_1km, rows_1km, projection_1km, geotransform_1km = read_tif(tifs_1km_path)
+    LST_K_day_2km, LST_K_night_2km, cols_2km, rows_2km, projection_2km, geotransform_2km = read_tif(tifs_2km_path)
+
+    return ndvi_1km, LST_K_day_1km, ndvi_2km, LST_K_day_2km
+
+
+
+
+def get_mean_std(all_data_loader):
+    mean_ndvi_1km   = []
+    std_ndvi_1km    = []
+    mean_ndvi_2km   = []
+    std_ndvi_2km    = []
+
+    mean_LST_K_day_1km   = []
+    std_LST_K_day_1km    = []
+    mean_LST_K_day_2km   = []
+    std_LST_K_day_2km    = []
+    for ndvi_1km, LST_K_day_1km, ndvi_2km, LST_K_day_2km in all_data_loader:
+        mean_ndvi_1km.append(ndvi_1km.mean().item())
+        mean_ndvi_2km.append(ndvi_2km.mean().item())
+        mean_LST_K_day_1km.append(LST_K_day_1km.mean().item())
+        mean_LST_K_day_2km.append(LST_K_day_2km.mean().item())
+
+        std_ndvi_1km.append(ndvi_1km.std().item())
+        std_ndvi_2km.append(ndvi_2km.std().item())
+        std_LST_K_day_1km.append(LST_K_day_1km.std().item())
+        std_LST_K_day_2km.append(LST_K_day_2km.std().item())
+
+
+    mean_all = {}
+    std_all = {}
+
+    mean_all["ndvi_1km"] = np.mean(mean_ndvi_1km)
+    mean_all["ndvi_2km"] = np.mean(mean_ndvi_2km)
+    mean_all["LST_K_day_1km"] = np.mean(mean_LST_K_day_1km)
+    mean_all["LST_K_day_2km"] = np.mean(mean_LST_K_day_2km)
+
+    std_all["ndvi_1km"] = np.mean(std_ndvi_1km)
+    std_all["ndvi_2km"] = np.mean(std_ndvi_2km)
+    std_all["LST_K_day_1km"] = np.mean(std_LST_K_day_1km)
+    std_all["LST_K_day_2km"] = np.mean(std_LST_K_day_2km)
+
+    return mean_all, std_all
