@@ -60,20 +60,6 @@ The simple lay concatenation doesn't generate better performance than Bicubic.
 /opt/img/MATLAB_R2021a/bin/matlab -nodesktop -nosplash
 /opt/img/MATLAB_R2018b/bin/matlab -nodesktop -nosplash
 
-# Dataset transfer
-scp -v -r g19tian@srv-df-895:/users/local/Downloader/MODIS_just_tif.zip /users/local/Dataset/
-scp -v -r g19tian@srv-df-895:/users/local/Downloader/MODIS_just_tif.zip g19tian@srv-df-893:/users/local/Dataset/
-scp -v -r g19tian@srv-df-895:/users/local/Downloader/MODIS_just_tif.zip g19tian@srv-df-894:/users/local/Dataset/
-scp -v -r g19tian@srv-df-895:/users/local/Downloader/MODIS_just_tif.zip g19tian@srv-df-896:/users/local/Dataset/
-
-scp -v -r /users/local/MODIS g19tian@srv-df-892:/users/local/MODIS
-
-
-scp -v -r C:/Users/11849/Downloads/MODIS_just_tif.zip g19tian@srv-df-892:/users/local/Dataset/
-scp -v -r C:/Users/11849/Downloads/MODIS_just_tif.zip g19tian@srv-df-893:/users/local/Dataset/
-scp -v -r C:/Users/11849/Downloads/MODIS_just_tif.zip g19tian@srv-df-894:/users/local/Dataset/
-scp -v -r C:/Users/11849/Downloads/MODIS_just_tif.zip g19tian@srv-df-896:/users/local/Dataset/
-
 # test code 
 
 nohup python -u train.py UNet_Minh > ~/Documents/0_test/MSE_Grad_loss/UNet_Minh 2>&1 &
