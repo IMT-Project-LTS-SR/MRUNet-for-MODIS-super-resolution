@@ -1,4 +1,7 @@
 1. Model Unet x4 with skip: https://drive.google.com/file/d/1qdPoecsGya_aENkIttcQqqmesdg3F8c1/view?usp=sharing
-2. Model Unet x2 (MSE+GRAD?) with skip: https://drive.google.com/file/d/1pTnTWrNfVVuw5IlDaYP-yN-uJmPLFFNT/view?usp=sharing
+2. Model Unet x2 (MSE+GRAD? not correct so don't care about it) with skip: https://drive.google.com/file/d/1pTnTWrNfVVuw5IlDaYP-yN-uJmPLFFNT/view?usp=sharing
 3. Model Unet x2 (MSE only, the best so far) with skip: https://drive.google.com/file/d/1xJPBHdGOd41FyQro12gTc2DI1bM2E7zg/view?usp=sharing
 4. Model SR Restnet x2 (using MSE only, 8 res blocks with 256 features each block. Worst than Unet): https://drive.google.com/file/d/1Hk8cqm2W963Pgtpfl1PAV0G0zVtdBJvo/view?usp=sharing
+5. Model Unet x4 (MSE+GRAD) with skip: https://drive.google.com/file/d/1--FZUB8T4voxCEd_gFrmXnAZK2Sib4g3/view?usp=sharing
+6. Model Unet x4 (MSE+GRAD) with skip (for day images): https://drive.google.com/file/d/1DRUCqs0ccNOifKsfNCS-CXu8KyK-tu1y/view?usp=sharing
+   Model Unet x4 (MSE+GRAD) with skip (for night images): https://drive.google.com/file/d/1IaVsgnqXIlJ3_bq7SXjrHctqFfqPSsei/view?usp=sharing
