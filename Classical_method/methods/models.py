@@ -106,12 +106,217 @@ class UNet(nn.Module):
         return logits
 
 
+##############################################################################
+# class UNet_Minh(nn.Module):
+#     def __init__(self, n_channels=1, n_classes=1, bilinear=True):
+#         super(UNet_Minh, self).__init__()
+#         self.n_channels = n_channels
+#         self.n_classes = n_classes
+#         self.bilinear = bilinear
+
+#         self.inc = DoubleConv(n_channels, 64)
+#         self.down1 = Down(64, 128)
+#         self.down2 = Down(128, 256)
+#         self.down3 = Down(256, 512)
+#         factor = 2 if bilinear else 1
+#         self.down4 = Down(512, 1024 // factor)
+#         self.up1 = Up(1024, 512 // factor, bilinear)
+#         self.up2 = Up(512, 256 // factor, bilinear)
+#         self.up3 = Up(256, 128 // factor, bilinear)
+#         self.up4 = Up(128, 64, bilinear)
+#         self.outc = OutConv(64, n_classes)
+
+#     def forward(self, x):
+#         x1 = self.inc(x)
+#         x2 = self.down1(x1)
+#         x3 = self.down2(x2)
+#         x4 = self.down3(x3)
+#         x5 = self.down4(x4)
+#         xp = self.up1(x5, x4)
+#         xp = self.up2(xp, x3)
+#         xp = self.up3(xp, x2)
+#         xp = self.up4(xp, x1)
+#         # x = self.up(x)
+#         # x = self.up_dc(x)
+#         logits = self.outc(xp) + x
+#         return logits
+
+class UNet_Minh(nn.Module):
+    def __init__(self, n_channels=1, n_classes=1, bilinear=False):
+        super(UNet_Minh, self).__init__()
+        self.n_channels = n_channels
+        self.n_classes = n_classes
+        self.bilinear = bilinear
+
+        self.inc = DoubleConv(n_channels, 64)
+        self.down1 = Down(64, 128)
+        self.down2 = Down(128, 256)
+        self.down3 = Down(256, 512)
+        factor = 2 if bilinear else 1
+        self.down4 = Down(512, 1024 // factor)
+        self.up1 = Up(1024, 512 // factor, bilinear)
+        self.up2 = Up(512, 256 // factor, bilinear)
+        self.up3 = Up(256, 128 // factor, bilinear)
+        self.up4 = Up(128, 64, bilinear)
+        self.outc = OutConv(64, n_classes)
+        # self.up = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True)
+        self.up = nn.ConvTranspose2d(64, 64, kernel_size=2, stride=2)
+        self.up_dc = DoubleConv(64, 64)
+
+    def forward(self, x):
+        x1 = self.inc(x)
+        x2 = self.down1(x1)
+        x3 = self.down2(x2)
+        x4 = self.down3(x3)
+        x5 = self.down4(x4)
+        xp = self.up1(x5, x4)
+        xp = self.up2(xp, x3)
+        xp = self.up3(xp, x2)
+        xp = self.up4(xp, x1)
+        # x = self.up(x)
+        # x = self.up_dc(x)
+        logits = self.outc(xp) + x
+        return logits
+
+##############################################################################
+class UNet_Channel_Fusion(nn.Module):
+    def __init__(self, n_channels=1, n_classes=1, bilinear=True):
+        super(UNet_Channel_Fusion, self).__init__()
+        self.n_channels = n_channels
+        self.n_classes = n_classes
+        self.bilinear = bilinear
+
+        self.inc = DoubleConv(n_channels, 64)
+        self.down1 = Down(64, 128)
+        self.down2 = Down(128, 256)
+        self.down3 = Down(256, 512)
+        factor = 2 if bilinear else 1
+        self.down4 = Down(512, 1024 // factor)
+        self.up1 = Up(1024, 512 // factor, bilinear)
+        self.up2 = Up(512, 256 // factor, bilinear)
+        self.up3 = Up(256, 128 // factor, bilinear)
+        self.up4 = Up(128, 64, bilinear)
+        self.outc = OutConv(64, n_classes)
+        self.up = nn.ConvTranspose2d(64, 64, kernel_size=2, stride=2)
+        self.up_dc = DoubleConv(64, 64)
+
+        self.up2_ = nn.ConvTranspose2d(2, 2, kernel_size=2, stride=2)
+
+    def forward(self, x):
+        x1 = self.inc(x)
+        x2 = self.down1(x1)
+        x3 = self.down2(x2)
+        x4 = self.down3(x3)
+        x5 = self.down4(x4)
+        xp = self.up1(x5, x4)
+        xp = self.up2(xp, x3)
+        xp = self.up3(xp, x2)
+        xp = self.up4(xp, x1)
+        xp = self.up(xp)
+        xp = self.up_dc(xp)
+
+        x2 = self.up2_(x)
+        logits = self.outc(xp) + x2[:,0,:,:].unsqueeze(1)
+        
+        return logits
+
+##############################################################################
+class UNet_Channel_Fusion_Cubic_Inputs(nn.Module):
+    def __init__(self, n_channels=1, n_classes=1, bilinear=True, use_sigmoid=False):
+        super(UNet_Channel_Fusion_Cubic_Inputs, self).__init__()
+        self.n_channels = n_channels
+        self.n_classes = n_classes
+        self.bilinear = bilinear
+
+        self.inc = DoubleConv(n_channels, 64)
+        self.down1 = Down(64, 128)
+        self.down2 = Down(128, 256)
+        self.down3 = Down(256, 512)
+        factor = 2 if bilinear else 1
+        self.down4 = Down(512, 1024 // factor)
+        self.up1 = Up(1024, 512 // factor, bilinear)
+        self.up2 = Up(512, 256 // factor, bilinear)
+        self.up3 = Up(256, 128 // factor, bilinear)
+        self.up4 = Up(128, 64, bilinear)
+        self.outc = OutConv(64, n_classes)
+        self.up = nn.ConvTranspose2d(64, 64, kernel_size=2, stride=2)
+        self.up_dc = DoubleConv(64, 64)
+        self.up2_ = nn.ConvTranspose2d(2, 2, kernel_size=2, stride=2)
+
+        self.use_sigmoid = use_sigmoid
+        if use_sigmoid:
+            self.sigmoid = nn.Sigmoid()
+
+    def forward(self, x):
+        # x torch.Size([128, 2, 64, 64])
+        x1 = self.inc(x)        # torch.Size([128, 64, 64, 64])
+        x2 = self.down1(x1)     # torch.Size([128, 128, 32, 32])
+        x3 = self.down2(x2)     # torch.Size([128, 256, 16, 16])
+        x4 = self.down3(x3)     # torch.Size([128, 512, 8, 8])
+        x5 = self.down4(x4)     # torch.Size([128, 1024, 4, 4])
+        xp = self.up1(x5, x4)   # torch.Size([128, 512, 8, 8])
+        xp = self.up2(xp, x3)   # torch.Size([128, 256, 16, 16])
+        xp = self.up3(xp, x2)   # torch.Size([128, 128, 32, 32])
+        xp = self.up4(xp, x1)   # torch.Size([128, 64, 64, 64])
+        
+        
+        if self.use_sigmoid:
+            logits = self.outc(xp)                           # torch.Size([128, 1, 64, 64])
+            return self.sigmoid(logits)
+        else:
+            logits = self.outc(xp) + x[:,0,:,:].unsqueeze(1) # torch.Size([128, 1, 64, 64])
+            return logits
+        
+##############################################################################
+class UNet_Channel_Fusion_Cubic_Inputs_Add(nn.Module):
+    def __init__(self, n_channels=1, n_classes=1, bilinear=True, use_sigmoid=False):
+        super(UNet_Channel_Fusion_Cubic_Inputs_Add, self).__init__()
+        self.n_channels = n_channels
+        self.n_classes = n_classes
+        self.bilinear = bilinear
+
+        self.inc = DoubleConv(n_channels, 64)
+        self.down1 = Down(64, 128)
+        self.down2 = Down(128, 256)
+        self.down3 = Down(256, 512)
+        factor = 2 if bilinear else 1
+        self.down4 = Down(512, 1024 // factor)
+        self.up1 = Up(1024, 512 // factor, bilinear)
+        self.up2 = Up(512, 256 // factor, bilinear)
+        self.up3 = Up(256, 128 // factor, bilinear)
+        self.up4 = Up(128, 64, bilinear)
+        self.outc = OutConv(64, n_classes)
+        self.up = nn.ConvTranspose2d(64, 64, kernel_size=2, stride=2)
+        self.up_dc = DoubleConv(64, 64)
+        self.up2_ = nn.ConvTranspose2d(2, 2, kernel_size=2, stride=2)
+        self.use_sigmoid = use_sigmoid
+        if use_sigmoid:
+            self.sigmoid = nn.Sigmoid()
+
+
+    def forward(self, x):
+        # x torch.Size([128, 2, 64, 64])
+        x_add = x[:,1,:,:].unsqueeze(1)
+        x1 = self.inc(x_add)        # torch.Size([128, 64, 64, 64])
+        x2 = self.down1(x1)     # torch.Size([128, 128, 32, 32])
+        x3 = self.down2(x2)     # torch.Size([128, 256, 16, 16])
+        x4 = self.down3(x3)     # torch.Size([128, 512, 8, 8])
+        x5 = self.down4(x4)     # torch.Size([128, 1024, 4, 4])
+        xp = self.up1(x5, x4)   # torch.Size([128, 512, 8, 8])
+        xp = self.up2(xp, x3)   # torch.Size([128, 256, 16, 16])
+        xp = self.up3(xp, x2)   # torch.Size([128, 128, 32, 32])
+        xp = self.up4(xp, x1)   # torch.Size([128, 64, 64, 64])
+        
+        if self.use_sigmoid:
+            logits = self.outc(xp)                           # torch.Size([128, 1, 64, 64])
+            return self.sigmoid(logits)
+        else:
+            logits = self.outc(xp) + x[:,0,:,:].unsqueeze(1) # torch.Size([128, 1, 64, 64])
+            return logits
+
 
 
 ##############################################################################
-
-
-
 
 def disp_to_depth(disp, min_depth, max_depth):
     """Convert network's sigmoid output into depth prediction
@@ -469,15 +674,18 @@ class Encoder_Decoder(nn.Module):
 
         self.decoder = nn.ModuleList(list(self.convs.values()))
         self.sigmoid = nn.Sigmoid()
+        self.tanh = nn.Tanh()
 
-        self.conv_tmp = nn.Conv2d(1, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
+        self.conv_tmp = nn.Conv2d(2, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
 
 
 
     def forward(self, x):
+        x_input = x
         # Encoder
         # x = (input_image - 0.45) / 0.225                    # torch.Size([512, 64, 32, 32])
-        x = self.up(x)
+        # x                                                 # torch.Size([256, 1, 32, 32])
+        x = self.up(x)                                      # torch.Size([256, 1, 64, 64])
         # x = self.encoder.conv1(x)                           # torch.Size([512, 64, 32,32])
         x = self.conv_tmp(x)                                # torch.Size([512, 64, 32,32])
         x = self.encoder.bn1(x)                             # torch.Size([512, 64, 32,32])
@@ -509,58 +717,14 @@ class Encoder_Decoder(nn.Module):
             x = torch.cat(x, 1)
             x = self.convs[("upconv", i, 1)](x)
             if i in self.scales:
-                self.outputs[("disp", i)] = self.sigmoid(self.convs[("dispconv", i)](x))
+                self.outputs[("disp", i)] = self.convs[("dispconv", i)](x)
+                # self.outputs[("disp", i)] = self.tanh(self.convs[("dispconv", i)](x))
+                # self.outputs[("disp", i)] = self.sigmoid(self.convs[("dispconv", i)](x))
             # torch.Size([512, 256, 4, 4])
             # torch.Size([512, 128, 8, 8])
             # torch.Size([512, 64, 16, 16])
             # torch.Size([512, 32, 32, 32])
+        
         return self.outputs[("disp", 0)]
 
 #################################################
-
-def ATPRK(ndvi_1km, LST_K_day_1km, ndvi_2km, LST_K_day_2km):
-    #FIT
-    path_index = ndvi_2km
-    path_temperature = LST_K_day_2km
-    #path_index = 'TEST_Thunmpy_08-07-2019/Index/NDBI_080628_100m.dat'
-    #path_temperature = 'TEST_Thunmpy_08-07-2019/Temp/LST_4_bandes_jour_satellite_100m_bruite.bsq'
-    min_T = 270
-    path_fit = 'Fit_NDBI_T.txt'
-    plot =0
-    path_plot = 'tmp_fig/NDBI_vs_T.png'
-
-    linear_fit_test(path_index, path_temperature, min_T, path_fit, plot, path_plot)
-    # index (894, 135)
-    # Temp (894, 135)
-
-    #UNMIXING
-    path_index = ndvi_1km
-    path_temperature = LST_K_day_2km
-    path_fit = 'Fit_NDBI_T.txt'
-    path_out = 'T_unm_1km_from2km_jourNDBI.bsq'
-    iscale=2
-    path_mask=0
-
-    T_unm = linear_unmixing_test(path_index, path_temperature, path_fit, iscale,path_mask, path_out)
-    # index (1787, 269)
-    # Temp (358, 54)
-
-    #CORR
-    path_index = ndvi_2km
-    path_fit = 'Fit_NDBI_T.txt'
-    path_temperature = LST_K_day_2km
-    path_unm = 'T_unm_1km_from2km_jourNDBI.bsq'
-    iscale=2
-    # scc=2
-    scc=32
-    block_size = 3 # 3 
-    sill=7
-    ran=1000
-    path_out='Delta_T_1km_from2km_jour_NDBI_atprk.bsq'
-    path_out1='T_unm_add_1km_from2km_jour_NDBI_atprk.bsq'
-    path_out2='Delta_T_final_1km_from2km_jour_NDBI_atprk.bsq'
-    path_out3='T_unmixed_final_1km_from2km_jour_NDBI_atprk.bsq'
-    path_plot= 'Gamma_c_NDBI_2km.png'
-
-    prediction , Delta_T_final, TT_unm= correction_ATPRK_test(path_index, path_fit, path_temperature, path_unm, iscale, scc, block_size, sill, ran, path_out, path_out1, path_out2, path_out3,path_plot,T_unm)
-    return prediction, LST_K_day_1km, Delta_T_final, TT_unm

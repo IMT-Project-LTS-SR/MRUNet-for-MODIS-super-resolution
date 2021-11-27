@@ -1,6 +1,4 @@
-# %cd /content/drive/MyDrive/Ganglin/1_IMT/MCE_Projet3A/Classical_method/
-
-from test_unet import *
+# from test_unet import *
 import torch
 import torch.nn as nn
 from torch.nn import functional as F
@@ -8,7 +6,9 @@ from utils import *
 import os
 import time
 ###############################################
+# from unet_parts import *
 import cv2
+import math
 
 import sys
 sys.path.insert(0,".") 
@@ -23,10 +23,10 @@ from utils import *
 import os
 
 
-def ATPRK(ndvi_1km, LST_K_day_1km, ndvi_2km, LST_K_day_2km):
+def ATPRK(ndvi_1km, LSTd_1km, ndvi_2km, LSTd_2km):
     #FIT
     path_index = ndvi_2km
-    path_temperature = LST_K_day_2km
+    path_temperature = LSTd_2km
     #path_index = 'TEST_Thunmpy_08-07-2019/Index/NDBI_080628_100m.dat'
     #path_temperature = 'TEST_Thunmpy_08-07-2019/Temp/LST_4_bandes_jour_satellite_100m_bruite.bsq'
     min_T = 270
@@ -40,7 +40,7 @@ def ATPRK(ndvi_1km, LST_K_day_1km, ndvi_2km, LST_K_day_2km):
 
     #UNMIXING
     path_index = ndvi_1km
-    path_temperature = LST_K_day_2km
+    path_temperature = LSTd_2km
     path_fit = 'Fit_NDBI_T.txt'
     path_out = 'T_unm_1km_from2km_jourNDBI.bsq'
     iscale=2
@@ -53,10 +53,11 @@ def ATPRK(ndvi_1km, LST_K_day_1km, ndvi_2km, LST_K_day_2km):
     #CORR
     path_index = ndvi_2km
     path_fit = 'Fit_NDBI_T.txt'
-    path_temperature = LST_K_day_2km
+    path_temperature = LSTd_2km
     path_unm = 'T_unm_1km_from2km_jourNDBI.bsq'
     iscale=2
-    scc=2
+    # scc=2
+    scc=32
     block_size = 3 # 3 
     sill=7
     ran=1000
@@ -67,7 +68,7 @@ def ATPRK(ndvi_1km, LST_K_day_1km, ndvi_2km, LST_K_day_2km):
     path_plot= 'Gamma_c_NDBI_2km.png'
 
     prediction = correction_ATPRK_test(path_index, path_fit, path_temperature, path_unm, iscale, scc, block_size, sill, ran, path_out, path_out1, path_out2, path_out3,path_plot,T_unm)
-    return prediction, LST_K_day_1km
+    return prediction, LSTd_1km
 
 
 
@@ -93,27 +94,29 @@ if __name__ == '__main__':
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size)
     valid_loader = torch.utils.data.DataLoader(valid_dataset, batch_size=batch_size)
 
-    cubic_labels = np.zeros([len(train_dataset),64,64])
-    cubic_predictions = np.zeros([len(train_dataset),64,64])
-    cubic_PSNR = np.zeros(len(train_dataset))
-    cubic_RMSE = np.zeros(len(train_dataset))
-    atprk_labels = np.zeros([len(train_dataset),64,64])
-    atprk_predictions = np.zeros([len(train_dataset),64,64])
-    atprk_PSNR = np.zeros(len(train_dataset))
-    atprk_RMSE = np.zeros(len(train_dataset))
-    for idx, (ndvi_1km, LST_K_day_1km, ndvi_2km, LST_K_day_2km) in enumerate(train_dataset):
+    cubic_labels = np.zeros([len(valid_dataset),64,64])
+    cubic_predictions = np.zeros([len(valid_dataset),64,64])
+    cubic_PSNR = np.zeros(len(valid_dataset))
+    cubic_RMSE = np.zeros(len(valid_dataset))
+
+    
+    atprk_labels = np.zeros([len(valid_dataset),64,64])
+    atprk_predictions = np.zeros([len(valid_dataset),64,64])
+    atprk_PSNR = np.zeros(len(valid_dataset))
+    atprk_RMSE = np.zeros(len(valid_dataset))
+    for idx, (ndvi_1km, LSTd_1km, ndvi_2km, LSTd_2km) in enumerate(valid_dataset):
         # Test cubic
-        cubic_predictions[idx,:,:] = cv2.resize(LST_K_day_2km, (LST_K_day_1km.shape), cv2.INTER_CUBIC)
-        cubic_labels[idx,:,:] = LST_K_day_1km
+        cubic_predictions[idx,:,:] = cv2.resize(LSTd_2km, (LSTd_1km.shape), cv2.INTER_CUBIC)
+        cubic_labels[idx,:,:] = LSTd_1km
         cubic_PSNR[idx], cubic_RMSE[idx] = psnr_notorch(cubic_labels[idx,:,:], cubic_predictions[idx,:,:])
         
         #%% 2. Test ATPRK
-        atprk_predictions[idx,:,:], atprk_labels[idx,:,:]= ATPRK(ndvi_1km, LST_K_day_1km, ndvi_2km, LST_K_day_2km)
-        atprk_PSNR[idx], atprk_RMSE[idx] = psnr_notorch(atprk_labels[idx,:,:], atprk_predictions[idx,:,:])
+        atprk_predictions[idx,:,:], atprk_labels[idx,:,:]= ATPRK(ndvi_1km, LSTd_1km, ndvi_2km, LSTd_2km)
+        atprk_PSNR[idx], atprk_RMSE[idx] = psnr_notorch(atprk_labels[idx,2:-2,2:-2], atprk_predictions[idx,2:-2,2:-2])
         print("Idx {} PSNR: {:.4f} and RMSE {:.4f}: ".format(str(idx).zfill(3),atprk_PSNR[idx], atprk_RMSE[idx]))
 
         fig, ax = plt.subplots(nrows=1, ncols=3, figsize=(18, 6))
-        ax[0].imshow(LST_K_day_1km)
+        ax[0].imshow(LSTd_1km)
         ax[0].set_title("1km_gt")
 
         ax[1].imshow(atprk_predictions[idx,:,:])
@@ -123,7 +126,7 @@ if __name__ == '__main__':
         ax[2].set_title("1km_cubic")
 
         os.makedirs("tmp_fig_delete/",exist_ok=1)
-        plt.savefig("tmp_fig_delete/LST_K_day_1km_{}.png".format(idx))
+        plt.savefig("tmp_fig_delete/LSTd_1km_{}.png".format(idx))
         plt.close('all')
    
 
@@ -139,8 +142,23 @@ if __name__ == '__main__':
     ax[1].set_title("RMSE")
     ax[1].legend(['atprk rmse {:.4f}'.format(np.mean(atprk_RMSE)),'cubic rmse {:.4f}'.format(np.mean(cubic_RMSE))])
 
-    plt.savefig("Compare_ATPRK_and_Cubic.png")
+    os.makedirs("outputs/ATPRK/images")
+    plt.savefig("outputs/ATPRK/images/Compare_ATPRK_and_Cubic.png")
     plt.show()
+
+
+
+    # fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(6, 6))
+    plt.figure()
+    plt.plot(atprk_RMSE,'r')
+    plt.plot(cubic_RMSE,'b')
+    plt.plot(np.array(unet_RMSE),'g')
+    plt.title("RMSE")
+    plt.legend(['atprk rmse {:.4f}'.format(np.mean(atprk_RMSE)),\
+                'cubic rmse {:.4f}'.format(np.mean(cubic_RMSE)),\
+                'unet rmse {:.4f}'.format(np.mean(unet_RMSE))])
+    plt.savefig("outputs/ATPRK/images/Compare_ATPRK_and_Cubic_and_unet.png")
+
 
     Compare_ATPRK_and_Cubic = {}
 
@@ -154,4 +172,4 @@ if __name__ == '__main__':
     Compare_ATPRK_and_Cubic["cubic_PSNR"] = cubic_PSNR
     Compare_ATPRK_and_Cubic["cubic_RMSE"] = cubic_RMSE
 
-    np.save("Compare_ATPRK_and_Cubic",Compare_ATPRK_and_Cubic)
+    np.save("outputs/ATPRK/Compare_ATPRK_and_Cubic",Compare_ATPRK_and_Cubic)

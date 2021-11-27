@@ -8,6 +8,10 @@ import math
 from scipy.spatial.distance import pdist, squareform
 import scipy.optimize as opt
 import torch
+from dataloader import NDVI_LST
+import os
+import time
+
 
 def psnr_notorch(label, outputs):
     """
@@ -600,7 +604,7 @@ def correction_ATPRK_test(path_index, path_fit, path_temperature, path_unm, isca
     # plt.savefig("tmp_fig/TT_unmixed_corrected.png")
     # print("index",index.shape)
     # print("Temp",Temp.shape)
-    return TT_unmixed_corrected, Delta_T_final, TT_unm
+    return TT_unmixed_corrected
 
 def setup_seed(seed):
     import random
@@ -648,47 +652,152 @@ def get_ndvi_and_lst():
     #
     tifs_1km_path = '/content/drive/MyDrive/Ganglin/1_IMT/MCE_Projet3A/MODIS/MOD_2020_MOD11A1/tifs_files/1km_of_MOD11A1.A2020001.h18v04.061.2021003092415.hdf.0015.tif'
     tifs_2km_path = '/content/drive/MyDrive/Ganglin/1_IMT/MCE_Projet3A/MODIS/MOD_2020_MOD11A1/tifs_files/2km_of_MOD11A1.A2020001.h18v04.061.2021003092415.hdf.0015.tif'
-    LST_K_day_1km, LST_K_night_1km, cols_1km, rows_1km, projection_1km, geotransform_1km = read_tif(tifs_1km_path)
-    LST_K_day_2km, LST_K_night_2km, cols_2km, rows_2km, projection_2km, geotransform_2km = read_tif(tifs_2km_path)
+    LSTd_1km, LST_K_night_1km, cols_1km, rows_1km, projection_1km, geotransform_1km = read_tif(tifs_1km_path)
+    LSTd_2km, LST_K_night_2km, cols_2km, rows_2km, projection_2km, geotransform_2km = read_tif(tifs_2km_path)
 
-    return ndvi_1km, LST_K_day_1km, ndvi_2km, LST_K_day_2km
-
-
+    return ndvi_1km, LSTd_1km, ndvi_2km, LSTd_2km
 
 
-def get_mean_std(all_data_loader):
+
+
+def get_mean_stda_max_min(all_data_loader):
     mean_ndvi_1km   = []
-    std_ndvi_1km    = []
     mean_ndvi_2km   = []
-    std_ndvi_2km    = []
+    mean_LSTd_1km   = []
+    mean_LSTd_2km   = []
 
-    mean_LST_K_day_1km   = []
-    std_LST_K_day_1km    = []
-    mean_LST_K_day_2km   = []
-    std_LST_K_day_2km    = []
-    for ndvi_1km, LST_K_day_1km, ndvi_2km, LST_K_day_2km in all_data_loader:
+    stda_ndvi_1km   = []
+    stda_ndvi_2km   = []
+    stda_LSTd_1km   = []
+    stda_LSTd_2km   = []
+
+    max_ndvi_1km   = []
+    max_ndvi_2km   = []
+    max_LSTd_1km   = []
+    max_LSTd_2km   = []
+
+    min_ndvi_1km   = []
+    min_ndvi_2km   = []
+    min_LSTd_1km   = []
+    min_LSTd_2km   = []
+
+    for ndvi_1km, LSTd_1km, ndvi_2km, LSTd_2km in all_data_loader:
         mean_ndvi_1km.append(ndvi_1km.mean().item())
         mean_ndvi_2km.append(ndvi_2km.mean().item())
-        mean_LST_K_day_1km.append(LST_K_day_1km.mean().item())
-        mean_LST_K_day_2km.append(LST_K_day_2km.mean().item())
+        mean_LSTd_1km.append(LSTd_1km.mean().item())
+        mean_LSTd_2km.append(LSTd_2km.mean().item())
 
-        std_ndvi_1km.append(ndvi_1km.std().item())
-        std_ndvi_2km.append(ndvi_2km.std().item())
-        std_LST_K_day_1km.append(LST_K_day_1km.std().item())
-        std_LST_K_day_2km.append(LST_K_day_2km.std().item())
+        stda_ndvi_1km.append(ndvi_1km.std().item())
+        stda_ndvi_2km.append(ndvi_2km.std().item())
+        stda_LSTd_1km.append(LSTd_1km.std().item())
+        stda_LSTd_2km.append(LSTd_2km.std().item())
 
+
+        max_ndvi_1km.append(ndvi_1km.max().item())
+        max_ndvi_2km.append(ndvi_2km.max().item())
+        max_LSTd_1km.append(LSTd_1km.max().item())
+        max_LSTd_2km.append(LSTd_2km.max().item())
+
+        min_ndvi_1km.append(ndvi_1km.min().item())
+        min_ndvi_2km.append(ndvi_2km.min().item())
+        min_LSTd_1km.append(LSTd_1km.min().item())
+        min_LSTd_2km.append(LSTd_2km.min().item())
 
     mean_all = {}
-    std_all = {}
+    stda_all = {}
+    max_all = {}
+    min_all = {}
 
     mean_all["ndvi_1km"] = np.mean(mean_ndvi_1km)
     mean_all["ndvi_2km"] = np.mean(mean_ndvi_2km)
-    mean_all["LST_K_day_1km"] = np.mean(mean_LST_K_day_1km)
-    mean_all["LST_K_day_2km"] = np.mean(mean_LST_K_day_2km)
+    mean_all["LSTd_1km"] = np.mean(mean_LSTd_1km)
+    mean_all["LSTd_2km"] = np.mean(mean_LSTd_2km)
 
-    std_all["ndvi_1km"] = np.mean(std_ndvi_1km)
-    std_all["ndvi_2km"] = np.mean(std_ndvi_2km)
-    std_all["LST_K_day_1km"] = np.mean(std_LST_K_day_1km)
-    std_all["LST_K_day_2km"] = np.mean(std_LST_K_day_2km)
+    stda_all["ndvi_1km"] = np.mean(stda_ndvi_1km)
+    stda_all["ndvi_2km"] = np.mean(stda_ndvi_2km)
+    stda_all["LSTd_1km"] = np.mean(stda_LSTd_1km)
+    stda_all["LSTd_2km"] = np.mean(stda_LSTd_2km)
 
-    return mean_all, std_all
+    max_all["ndvi_1km"] = np.max(max_ndvi_1km)
+    max_all["ndvi_2km"] = np.max(max_ndvi_2km)
+    max_all["LSTd_1km"] = np.max(max_LSTd_1km)
+    max_all["LSTd_2km"] = np.max(max_LSTd_2km)
+
+    min_all["ndvi_1km"] = np.min(min_ndvi_1km)
+    min_all["ndvi_2km"] = np.min(min_ndvi_2km)
+    min_all["LSTd_1km"] = np.min(min_LSTd_1km)
+    min_all["LSTd_2km"] = np.min(min_LSTd_2km)
+
+    return mean_all, stda_all, max_all, min_all
+
+#########################################################
+# THIS CELL CONTAINS FUNCTIONS FOR COMPUTING GRADIENT
+def gradient_compute(img):
+    # THE SIMPLEST WAY TO CALCULATE GRADIENT
+    grad_x = torch.zeros(img.shape)
+    grad_y = torch.zeros(img.shape)
+    grad_x[:,:,:,:-1] = (img[:, :, :, :-1] - img[:, :, :, 1:])
+    grad_y[:,:,:-1,:] = (img[:, :, :-1, :] - img[:, :, 1:, :])
+
+    return torch.sqrt(grad_x**2 + grad_y**2 + 1e-20)
+
+def compute_grad(img):
+    # A MORE COMPLEX WAY TO CALCULATE GRADIENT
+    kernel_v = [[0, -1, 0], 
+                [0, 0, 0], 
+                [0, 1, 0]]
+    kernel_h = [[0, 0, 0], 
+                [-1, 0, 1], 
+                [0, 0, 0]]
+    kernel_h = torch.FloatTensor(kernel_h).unsqueeze(0).unsqueeze(0)
+    kernel_v = torch.FloatTensor(kernel_v).unsqueeze(0).unsqueeze(0)
+    weight_h = torch.nn.Parameter(data = kernel_h, requires_grad = False).cuda()
+    weight_v = torch.nn.Parameter(data = kernel_v, requires_grad = False).cuda()
+
+    x0_v = torch.nn.functional.conv2d(img, weight_v, padding=2)
+    x0_h = torch.nn.functional.conv2d(img, weight_h, padding=2)
+    x0 = torch.sqrt(torch.pow(x0_v, 2) + torch.pow(x0_h, 2)+1e-20)
+    return x0
+
+def get_grad_loss(disp, img):
+    # THE FINAL LOSS FUNCTION
+    mse_img = ((disp - img)**2).mean()
+    mse_grad = ((compute_grad(img) - compute_grad(disp))**2).mean()
+    return mse_img*0.7 + 0.3*mse_grad
+# loss = get_grad_loss(outputs*max_val, label)
+#########################################################
+
+
+def init():
+    print("Start")
+    
+    start_time = time.time()
+    root_dir = '../MODIS/'
+    LST_1km_dir = os.path.join(root_dir,"MOD_2020_MOD11A1/tifs_files/1km")
+    LST_2km_dir = os.path.join(root_dir,"MOD_2020_MOD11A1/tifs_files/2km")
+    NDVI_1km_dir = os.path.join(root_dir,"MOD_2020_MOD13A2/tifs_files/1km")
+    NDVI_2km_dir = os.path.join(root_dir,"MOD_2020_MOD13A2/tifs_files/2km")
+    LST_1km_files = os.listdir(LST_1km_dir)
+    LST_2km_files = os.listdir(LST_2km_dir)
+    NDVI_1km_files = os.listdir(NDVI_1km_dir)
+    NDVI_2km_files = os.listdir(NDVI_2km_dir)
+    LST_to_NDVI_dic = np.load(os.path.join(root_dir,"LST_to_NDVI_dic.npy"), allow_pickle=1).item()
+    num_workers = 4
+    batch_size  = 64
+
+    dataset = NDVI_LST(LST_1km_dir, LST_2km_dir, NDVI_1km_dir, NDVI_2km_dir, LST_1km_files, LST_2km_files, NDVI_1km_files, NDVI_2km_files, LST_to_NDVI_dic, use_small=0)
+    all_data_loader = torch.utils.data.DataLoader(dataset, batch_size=batch_size,shuffle=True, num_workers= num_workers)
+    mean_all, std_all, max_all, min_all = get_mean_stda_max_min(all_data_loader)
+    # dataset = NDVI_LST(LST_1km_dir, LST_2km_dir, NDVI_1km_dir, NDVI_2km_dir, LST_1km_files, LST_2km_files, NDVI_1km_files, NDVI_2km_files, LST_to_NDVI_dic,transform=1,mean_all=mean_all, std_all=std_all)
+    dataset = NDVI_LST(LST_1km_dir, LST_2km_dir, NDVI_1km_dir, NDVI_2km_dir, LST_1km_files, LST_2km_files, NDVI_1km_files, NDVI_2km_files, LST_to_NDVI_dic, use_small=1)
+
+    print("End, using {:.4f}s".format(time.time()-start_time))
+    valid_ratio = 0.2
+    valid_lengt = int(len(dataset) * valid_ratio)
+    train_lengt = len(dataset) - valid_lengt
+
+    train_dataset, valid_dataset = torch.utils.data.random_split(dataset=dataset,lengths=[train_lengt, valid_lengt])
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size,shuffle=True, num_workers= num_workers)
+    valid_loader = torch.utils.data.DataLoader(valid_dataset, batch_size=batch_size,shuffle=False, num_workers= num_workers)
+
+    return train_loader,valid_loader,batch_size, max_all, min_all, valid_lengt

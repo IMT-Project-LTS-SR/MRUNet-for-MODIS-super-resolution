@@ -5,7 +5,6 @@ import os
 from torchvision import transforms
 
 
-
 class NDVI_LST(torch.utils.data.Dataset):
     """
     NDVI_LST dataset.
@@ -52,10 +51,10 @@ class NDVI_LST(torch.utils.data.Dataset):
                                                         transforms.Normalize(mean=mean_all["ndvi_1km"], std=std_all["ndvi_1km"])])
             self.transform_ndvi_2km = transforms.Compose([transforms.ToTensor(),
                                                         transforms.Normalize(mean=mean_all["ndvi_2km"], std=std_all["ndvi_2km"])])
-            self.transform_LST_K_day_1km = transforms.Compose([transforms.ToTensor(),
-                                                            transforms.Normalize(mean=mean_all["LST_K_day_1km"], std=std_all["LST_K_day_1km"])])
-            self.transform_LST_K_day_2km = transforms.Compose([transforms.ToTensor(),
-                                                            transforms.Normalize(mean=mean_all["LST_K_day_2km"], std=std_all["LST_K_day_2km"])])
+            self.transform_LSTd_1km = transforms.Compose([transforms.ToTensor(),
+                                                            transforms.Normalize(mean=mean_all["LSTd_1km"], std=std_all["LSTd_1km"])])
+            self.transform_LSTd_2km = transforms.Compose([transforms.ToTensor(),
+                                                            transforms.Normalize(mean=mean_all["LSTd_2km"], std=std_all["LSTd_2km"])])
 
     def __len__(self):
         return len(self.LST_1km_files)
@@ -70,23 +69,22 @@ class NDVI_LST(torch.utils.data.Dataset):
         # get lst files
         tifs_1km_path = os.path.join(self.LST_1km_dir, lst_file_name)
         tifs_2km_path = os.path.join(self.LST_2km_dir, lst_file_name)
-        LST_K_day_1km, LST_K_night_1km, cols_1km, rows_1km, projection_1km, geotransform_1km = read_tif(tifs_1km_path)
-        LST_K_day_2km, LST_K_night_2km, cols_2km, rows_2km, projection_2km, geotransform_2km = read_tif(tifs_2km_path)
+        LSTd_1km, LST_K_night_1km, cols_1km, rows_1km, projection_1km, geotransform_1km = read_tif(tifs_1km_path)
+        LSTd_2km, LST_K_night_2km, cols_2km, rows_2km, projection_2km, geotransform_2km = read_tif(tifs_2km_path)
 
         # get ndvi files
         ndvi_file_name = self.LST_to_NDVI_dic[lst_file_name]
         ndvi_1km_path = os.path.join(self.NDVI_1km_dir, ndvi_file_name)
         ndvi_2km_path = os.path.join(self.NDVI_2km_dir, ndvi_file_name)
         ndvi_1km, ndvi_2km = self.get_ndvi(ndvi_1km_path, ndvi_2km_path)
-        # ndvi_1km = LST_K_day_1km
-        # ndvi_2km = LST_K_day_2km
+
         if self.transform:
             ndvi_1km = self.transform_ndvi_1km(ndvi_1km).squeeze(0)
             ndvi_2km = self.transform_ndvi_2km(ndvi_2km).squeeze(0)
-            LST_K_day_1km = self.transform_LST_K_day_1km(LST_K_day_1km).squeeze(0)
-            LST_K_day_2km = self.transform_LST_K_day_2km(LST_K_day_2km).squeeze(0)
+            LSTd_1km = self.transform_LSTd_1km(LSTd_1km).squeeze(0)
+            LSTd_2km = self.transform_LSTd_2km(LSTd_2km).squeeze(0)
 
-        return ndvi_1km, LST_K_day_1km, ndvi_2km, LST_K_day_2km
+        return ndvi_1km, LSTd_1km, ndvi_2km, LSTd_2km
 
     def get_ndvi(self, ndvi_1km_path, ndvi_2km_path):
         red, nir, mir, cols, rows, projection, geotransform = read_tif_MOD13A2(ndvi_1km_path)

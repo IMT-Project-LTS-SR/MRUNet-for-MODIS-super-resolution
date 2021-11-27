@@ -1,0 +1,57 @@
+nohup: les entrées sont ignorées
+WxPython missing, no GUI enabled
+Start to download MODIS/MOD_2004_MOD11A1/hdfs_files From 2004-05-01 to 2004-06-01
+Start to download MODIS/MOD_2004_MOD11A1/hdfs_files From 2004-03-01 to 2004-04-01
+Start to download MODIS/MOD_2004_MOD11A1/hdfs_files From 2004-07-01 to 2004-08-01
+Start to download MODIS/MOD_2004_MOD11A1/hdfs_files From 2004-09-01 to 2004-10-01
+Start to download MODIS/MOD_2004_MOD11A1/hdfs_files From 2004-01-01 to 2004-02-01
+Start to download MODIS/MOD_2004_MOD11A1/hdfs_files From 2004-11-01 to 2004-12-01
+Finish download MODIS/MOD_2004_MOD11A1/hdfs_files From 2004-11-01 to 2004-12-01, time cost: 2747.4107
+Start to download MODIS/MOD_2004_MOD11A1/hdfs_files From 2004-12-01 to 2004-12-31
+Finish download MODIS/MOD_2004_MOD11A1/hdfs_files From 2004-09-01 to 2004-10-01, time cost: 2749.9818
+Start to download MODIS/MOD_2004_MOD11A1/hdfs_files From 2004-10-01 to 2004-11-01
+Finish download MODIS/MOD_2004_MOD11A1/hdfs_files From 2004-01-01 to 2004-02-01, time cost: 2798.3827
+Start to download MODIS/MOD_2004_MOD11A1/hdfs_files From 2004-02-01 to 2004-03-01
+Finish download MODIS/MOD_2004_MOD11A1/hdfs_files From 2004-07-01 to 2004-08-01, time cost: 2828.4999
+Start to download MODIS/MOD_2004_MOD11A1/hdfs_files From 2004-08-01 to 2004-09-01
+Finish download MODIS/MOD_2004_MOD11A1/hdfs_files From 2004-03-01 to 2004-04-01, time cost: 2832.8911
+Start to download MODIS/MOD_2004_MOD11A1/hdfs_files From 2004-04-01 to 2004-05-01
+Finish download MODIS/MOD_2004_MOD11A1/hdfs_files From 2004-05-01 to 2004-06-01, time cost: 2861.8711
+Start to download MODIS/MOD_2004_MOD11A1/hdfs_files From 2004-06-01 to 2004-07-01
+Finish download MODIS/MOD_2004_MOD11A1/hdfs_files From 2004-02-01 to 2004-03-01, time cost: 2386.6186
+Finish download MODIS/MOD_2004_MOD11A1/hdfs_files From 2004-12-01 to 2004-12-31, time cost: 2514.0940
+Finish download MODIS/MOD_2004_MOD11A1/hdfs_files From 2004-04-01 to 2004-05-01, time cost: 2440.9213
+Finish download MODIS/MOD_2004_MOD11A1/hdfs_files From 2004-10-01 to 2004-11-01, time cost: 2565.8935
+Finish download MODIS/MOD_2004_MOD11A1/hdfs_files From 2004-06-01 to 2004-07-01, time cost: 2479.6426
+Finish download MODIS/MOD_2004_MOD11A1/hdfs_files From 2004-08-01 to 2004-09-01, time cost: 2623.9557
+Start to download MODIS/MOD_2004_MOD13A2/hdfs_files From 2004-03-01 to 2004-04-01
+Start to download MODIS/MOD_2004_MOD13A2/hdfs_files From 2004-05-01 to 2004-06-01
+Start to download MODIS/MOD_2004_MOD13A2/hdfs_files From 2004-07-01 to 2004-08-01
+Start to download MODIS/MOD_2004_MOD13A2/hdfs_files From 2004-01-01 to 2004-02-01
+Start to download MODIS/MOD_2004_MOD13A2/hdfs_files From 2004-11-01 to 2004-12-01
+Start to download MODIS/MOD_2004_MOD13A2/hdfs_files From 2004-09-01 to 2004-10-01
+Finish download MODIS/MOD_2004_MOD13A2/hdfs_files From 2004-11-01 to 2004-12-01, time cost: 166.0687
+Start to download MODIS/MOD_2004_MOD13A2/hdfs_files From 2004-12-01 to 2004-12-31
+Finish download MODIS/MOD_2004_MOD13A2/hdfs_files From 2004-07-01 to 2004-08-01, time cost: 240.9554
+Start to download MODIS/MOD_2004_MOD13A2/hdfs_files From 2004-08-01 to 2004-09-01
+Finish download MODIS/MOD_2004_MOD13A2/hdfs_files From 2004-09-01 to 2004-10-01, time cost: 244.4504
+Start to download MODIS/MOD_2004_MOD13A2/hdfs_files From 2004-10-01 to 2004-11-01
+Finish download MODIS/MOD_2004_MOD13A2/hdfs_files From 2004-05-01 to 2004-06-01, time cost: 249.1278
+Start to download MODIS/MOD_2004_MOD13A2/hdfs_files From 2004-06-01 to 2004-07-01
+Finish download MODIS/MOD_2004_MOD13A2/hdfs_files From 2004-01-01 to 2004-02-01, time cost: 258.4613
+Start to download MODIS/MOD_2004_MOD13A2/hdfs_files From 2004-02-01 to 2004-03-01
+Finish download MODIS/MOD_2004_MOD13A2/hdfs_files From 2004-03-01 to 2004-04-01, time cost: 274.3511
+Start to download MODIS/MOD_2004_MOD13A2/hdfs_files From 2004-04-01 to 2004-05-01
+Finish download MODIS/MOD_2004_MOD13A2/hdfs_files From 2004-12-01 to 2004-12-31, time cost: 233.0172
+Finish download MODIS/MOD_2004_MOD13A2/hdfs_files From 2004-08-01 to 2004-09-01, time cost: 225.1953
+Finish download MODIS/MOD_2004_MOD13A2/hdfs_files From 2004-10-01 to 2004-11-01, time cost: 225.5461
+Finish download MODIS/MOD_2004_MOD13A2/hdfs_files From 2004-06-01 to 2004-07-01, time cost: 225.6596
+Finish download MODIS/MOD_2004_MOD13A2/hdfs_files From 2004-02-01 to 2004-03-01, time cost: 233.5571
+Traceback (most recent call last):
+  File "modis_downloader.py", line 55, in <module>
+    MODIS_Parallel_Downloader(year,product, num_threads)
+  File "modis_downloader.py", line 40, in MODIS_Parallel_Downloader
+    print("Finish download {} From {} to {}, time cost: {:.4f}".format(hdfs_path, startdate,enddate,time.time()-start_time))
+  File "/homes/g19tian/anaconda3/envs/py36/lib/python3.6/site-packages/pymp/__init__.py", line 148, in __exit__
+    raise exc_t(exc_val)
+OSError: [Errno 122] Disk quota exceeded
