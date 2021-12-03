@@ -38,7 +38,7 @@ def main(model_name,train_loader,valid_loader,batch_size, max_all, min_all,valid
 
     chkpot_path = os.path.join("outputs/MSE_Grad_loss/{}/chkpts/".format(model_name))
     images_path = os.path.join("outputs/MSE_Grad_loss/{}/images/".format(model_name))
-    logevs_path = os.path.join("outputs/MSE_Grad_loss/{}/logevs/".format(model_name))
+    logevs_path = os.path.join("/homes/g19tian/Documents/outputs/1_projet3A/MSE_Grad_loss/{}/logevs/".format(model_name))
 
     os.makedirs(chkpot_path,exist_ok=1)
     os.makedirs(images_path,exist_ok=1)

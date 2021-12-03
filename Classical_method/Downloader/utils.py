@@ -8,13 +8,26 @@ import skimage.measure
 import pymp
 import time
 	
-def norm4(a,axis):
+def norm4_f2(a,axis):
 	# result = np.zeros((np.array(a.shape)/2).astype(int))
 	result = np.zeros([a.shape[0],a.shape[1]])
 	for i in range(a.shape[0]):
 		for j in range(a.shape[1]):
 			non_0 = np.sum(a[i,j,:,:]!=0)
 			if non_0 != 4:
+				result[i,j] = 0
+			else:
+				result[i,j] = ((np.sum(a[i,j,:,:]**4))/non_0)**0.25
+
+	return result
+
+def norm4_f4(a,axis):
+	# result = np.zeros((np.array(a.shape)/2).astype(int))
+	result = np.zeros([a.shape[0],a.shape[1]])
+	for i in range(a.shape[0]):
+		for j in range(a.shape[1]):
+			non_0 = np.sum(a[i,j,:,:]!=0)
+			if non_0 != 16:
 				result[i,j] = 0
 			else:
 				result[i,j] = ((np.sum(a[i,j,:,:]**4))/non_0)**0.25
@@ -82,7 +95,7 @@ def save_tif(out_file, LST_K_day, LST_K_night, cols, rows, projection, geotransf
 	num_px = LST_K_day.shape[0]*LST_K_day.shape[1]
 	# thres = 0.15 # Threshold: maximum number of sea/cloud pixels
 	thres = 0 # Threshold: maximum number of sea/cloud pixels
-
+	
 	if len(LST_K_day[LST_K_day==0.0]) > thres*num_px or len(LST_K_night[LST_K_night==0.0]) > thres*num_px:
 		return False
 
@@ -159,7 +172,7 @@ def read_modis(in_file):
 	return LST_K_day, LST_K_night, cols, rows, projection, geotransform
 
 
-def crop_modis(hdf_path, hdf_name, save_dir, save_dir_downsample,step=64,size=(64,64)):
+def crop_modis(hdf_path, hdf_name, save_dir, save_dir_downsample_2, save_dir_downsample_4,step=64,size=(64,64)):
 	"""
 	INPUT:
 	hdf_path = input image path to be cropped | or hdf file path ("/a/b/c.hdf")
@@ -221,10 +234,16 @@ def crop_modis(hdf_path, hdf_name, save_dir, save_dir_downsample,step=64,size=(6
 		succes = save_tif(save_path, img_days[i], img_nights[i], cols2, rows2, projection, geotransform2s[i])
 
 		if succes:
-			save_path_downsample = os.path.join(save_dir_downsample,img_cropped_names[i])
-			img_day_downsample = skimage.measure.block_reduce(img_days[i],(2,2),norm4)
-			img_night_downsample = skimage.measure.block_reduce(img_nights[i],(2,2),norm4)
-			_ = save_tif(save_path_downsample, img_day_downsample, img_night_downsample, cols2, rows2, projection, geotransform2s[i])
+			save_path_downsample_2 = os.path.join(save_dir_downsample_2,img_cropped_names[i])
+			save_path_downsample_4 = os.path.join(save_dir_downsample_4,img_cropped_names[i])
+
+			img_day_downsample_2 = skimage.measure.block_reduce(img_days[i],(2,2),norm4_f2)
+			img_night_downsample_2 = skimage.measure.block_reduce(img_nights[i],(2,2),norm4_f2)
+			img_day_downsample_4 = skimage.measure.block_reduce(img_days[i],(4,4),norm4_f4)
+			img_night_downsample_4 = skimage.measure.block_reduce(img_nights[i],(4,4),norm4_f4)
+
+			_ = save_tif(save_path_downsample_2, img_day_downsample_2, img_night_downsample_2, cols2, rows2, projection, geotransform2s[i])
+			_ = save_tif(save_path_downsample_4, img_day_downsample_4, img_night_downsample_4, cols2, rows2, projection, geotransform2s[i])
 
 			# print("img_night_downsample",img_night_downsample)
 			# # Display image
@@ -245,3 +264,172 @@ def crop_modis(hdf_path, hdf_name, save_dir, save_dir_downsample,step=64,size=(6
 			# plt.colorbar()
 			# plt.title("2km")
 			# plt.show()
+		else:
+			# print("Not success!")
+			pass
+
+
+def save_tif_MOD13A2(out_file, red_downsample, NIR_downsample, MIR_downsample, cols, rows, projection, geotransform):
+# def save_tif(out_file, LST_K_day, LST_K_night, cols, rows, projection, geotransform):
+
+	# Eliminate the clouds' pixel
+	num_px = red_downsample.shape[0]*red_downsample.shape[1]
+	thres = 0 # Threshold: maximum number of sea/cloud pixels
+	# thres = 0.15 # Threshold: maximum number of sea/cloud pixels
+	if len(red_downsample[red_downsample==0.0]) > thres*num_px or len(NIR_downsample[NIR_downsample==0.0]) > thres*num_px or len(MIR_downsample[MIR_downsample==0.0]) > thres*num_px:
+		return False
+
+	bands = 3
+	red_NIR_MIR_imgs = np.zeros((3,red_downsample.shape[0],red_downsample.shape[1]))
+	red_NIR_MIR_imgs[0,:,:]= red_downsample
+	red_NIR_MIR_imgs[1,:,:]= NIR_downsample
+	red_NIR_MIR_imgs[2,:,:]= MIR_downsample
+
+	driver = gdal.GetDriverByName("GTiff")
+	outDs = driver.Create(out_file, red_NIR_MIR_imgs.shape[1], red_NIR_MIR_imgs.shape[2], bands, gdal.GDT_Float32) 
+	outDs.SetProjection(projection)
+	outDs.SetGeoTransform(geotransform) 
+
+	for i in range(1,bands+1):
+		outBand = outDs.GetRasterBand(i)
+		outBand.WriteArray(red_NIR_MIR_imgs[i-1,:,:])
+		outDs.FlushCache()
+		
+	return True
+
+def read_modis_MOD13A2(in_file):
+	# in_file = "MODIS/MOD_2020/hdfs_files/MOD13A2.A2020001.h18v04.061.2020326033640.hdf"
+	# in_file = '/content/drive/MyDrive/Ganglin/1_IMT/MCE_Projet3A/MODIS/MOD_2020/hdfs_files/MOD11A1.A2020001.h18v04.061.2021003092415.hdf'
+	dataset = gdal.Open(in_file,gdal.GA_ReadOnly)
+	subdataset =	gdal.Open(dataset.GetSubDatasets()[3][0], gdal.GA_ReadOnly)
+
+	cols =subdataset.RasterXSize
+	rows = subdataset.RasterYSize
+	projection = subdataset.GetProjection()
+	geotransform = subdataset.GetGeoTransform()
+
+	# We read the Image as an array
+	band = subdataset.GetRasterBand(1)
+	LST_raw = band.ReadAsArray(0, 0, cols, rows).astype(np.float)
+
+	# To convert LST MODIS units to Kelvin
+	red =0.02*LST_raw
+
+	# open dataset Night
+	dataset = gdal.Open(in_file,gdal.GA_ReadOnly)
+	subdataset =	gdal.Open(dataset.GetSubDatasets()[4][0], gdal.GA_ReadOnly)
+
+	# We read the Image as an array
+	band = subdataset.GetRasterBand(1)
+	LST_raw = band.ReadAsArray(0, 0, cols, rows).astype(np.float)
+	# bandtype = gdal.GetDataTypeName(band.DataType)
+	# To convert LST MODIS units to Kelvin
+	NIR =0.02*LST_raw
+
+	# open dataset Night
+	dataset = gdal.Open(in_file,gdal.GA_ReadOnly)
+	subdataset =	gdal.Open(dataset.GetSubDatasets()[6][0], gdal.GA_ReadOnly)
+
+	# We read the Image as an array
+	band = subdataset.GetRasterBand(1)
+	LST_raw = band.ReadAsArray(0, 0, cols, rows).astype(np.float)
+	# bandtype = gdal.GetDataTypeName(band.DataType)
+	# To convert LST MODIS units to Kelvin
+	MIR =0.02*LST_raw
+	return red, NIR, MIR, cols, rows, projection, geotransform
+
+def crop_modis_MOD13A2(hdf_path, hdf_name, save_dir, save_dir_downsample_2, save_dir_downsample_4,step=64,size=(64,64)):
+	"""
+	INPUT:
+	hdf_path = input image path to be cropped | or hdf file path ("/a/b/c.hdf")
+	save_dir = directory for saving cropped images
+	step, size: parameters of "sliding_window()"
+
+	OUTPUT: images cropped from the image in hdf_path, saved to save_dir
+	"""
+	if not hdf_path.endswith('hdf'): 
+		print("Not hdf file Sorry!")
+		return 
+
+	img_day, img_night, cols, rows, projection, geotransform = read_modis(hdf_path)
+	
+	img_days = []
+	img_nights = []
+	img_cropped_names = []
+	geotransform2s = []
+	cols2, rows2 = size
+
+	if img_day is None or img_night is None:
+		print("Cannot handle this MODIS file: ", hdf_path, ". Please check it again")
+		return
+
+	red, NIR, MIR, cols, rows, projection, geotransform = read_modis_MOD13A2(hdf_path)
+
+	reds = []
+	NIRs = []
+	MIRs = []
+	img_cropped_names = []
+	geotransform2s = []
+	cols2, rows2 = size
+
+	if red is None or NIR is None or MIR is None:
+		print("Cannot handle this MODIS file: ", hdf_path, ". Please check it again")
+	# For day image
+	win_count = 0
+	for (x,y,window) in sliding_window(red, step, size):
+		if window.shape[0] != size[0] or window.shape[1] != size[1]:
+				continue
+
+		img_cropped_name = hdf_name + ".{}.tif".format(str(win_count).zfill(4))
+		img_cropped = window
+		geotransform2 = np.asarray(geotransform)
+		geotransform2[0] = geotransform[0]+x*geotransform[1] # 1st coordinate of top left pixel of the image 
+		geotransform2[3] = geotransform[3]+y*geotransform[5] # 2nd coordinate of top left pixel of the image
+		geotransform2=tuple(geotransform2)
+
+		img_cropped_names.append(img_cropped_name)
+		reds.append(img_cropped)
+		geotransform2s.append(geotransform2)
+		
+		win_count += 1
+	# print("Number of cropped day images", win_count)
+	
+	# For NIR image
+	win_count = 0
+	for (x,y,window) in sliding_window(NIR, step, size):
+		if window.shape[0] != size[0] or window.shape[1] != size[1]:
+				continue
+		img_cropped = window
+		# np.save(save_path,img_cropped)
+		NIRs.append(img_cropped)
+		win_count += 1
+
+	# For MIR image
+	win_count = 0
+	for (x,y,window) in sliding_window(MIR, step, size):
+		if window.shape[0] != size[0] or window.shape[1] != size[1]:
+				continue
+		img_cropped = window
+		# np.save(save_path,img_cropped)
+		MIRs.append(img_cropped)
+		win_count += 1
+
+	# Save images and metadata into .tif file
+	for i in range(len(img_cropped_names)):
+		save_path = os.path.join(save_dir,img_cropped_names[i])
+		succes = save_tif_MOD13A2(save_path, reds[i], NIRs[i], MIRs[i], cols2, rows2, projection, geotransform2s[i])
+
+		if succes:
+			save_path_downsample_2 = os.path.join(save_dir_downsample_2,img_cropped_names[i])
+			save_path_downsample_4 = os.path.join(save_dir_downsample_4,img_cropped_names[i])
+			red_downsample_2 = skimage.measure.block_reduce(reds[i],(2,2),norm4_f2)
+			NIR_downsample_2 = skimage.measure.block_reduce(NIRs[i],(2,2),norm4_f2)
+			MIR_downsample_2 = skimage.measure.block_reduce(MIRs[i],(2,2),norm4_f2)
+
+			red_downsample_4 = skimage.measure.block_reduce(reds[i],(4,4),norm4_f4)
+			NIR_downsample_4 = skimage.measure.block_reduce(NIRs[i],(4,4),norm4_f4)
+			MIR_downsample_4 = skimage.measure.block_reduce(MIRs[i],(4,4),norm4_f4)
+
+
+			_ = save_tif_MOD13A2(save_path_downsample_2, red_downsample_2, NIR_downsample_2, MIR_downsample_2, cols2, rows2, projection, geotransform2s[i])
+			_ = save_tif_MOD13A2(save_path_downsample_4, red_downsample_4, NIR_downsample_4, MIR_downsample_4, cols2, rows2, projection, geotransform2s[i])
