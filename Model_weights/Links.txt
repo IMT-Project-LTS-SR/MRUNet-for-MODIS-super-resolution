@@ -5,3 +5,4 @@
 5. Model Unet x4 (MSE+GRAD) with skip: https://drive.google.com/file/d/1--FZUB8T4voxCEd_gFrmXnAZK2Sib4g3/view?usp=sharing
 6. Model Unet x4 (MSE+GRAD) with skip (for day images): https://drive.google.com/file/d/1DRUCqs0ccNOifKsfNCS-CXu8KyK-tu1y/view?usp=sharing
    Model Unet x4 (MSE+GRAD) with skip (for night images): https://drive.google.com/file/d/1IaVsgnqXIlJ3_bq7SXjrHctqFfqPSsei/view?usp=sharing
+7. Model Unet x4 (MSE+GRAD) with 1 Residual block: https://drive.google.com/file/d/1fJ2sBoXxb31fscK5RzH-imycBJO5_yNr/view?usp=sharing
