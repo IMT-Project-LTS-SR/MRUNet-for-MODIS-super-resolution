@@ -6,3 +6,4 @@
 6. Model Unet x4 (MSE+GRAD) with skip (for day images): https://drive.google.com/file/d/1DRUCqs0ccNOifKsfNCS-CXu8KyK-tu1y/view?usp=sharing
    Model Unet x4 (MSE+GRAD) with skip (for night images): https://drive.google.com/file/d/1IaVsgnqXIlJ3_bq7SXjrHctqFfqPSsei/view?usp=sharing
 7. Model Unet x4 (MSE+GRAD) with 1 Residual block: https://drive.google.com/file/d/1fJ2sBoXxb31fscK5RzH-imycBJO5_yNr/view?usp=sharing
+8. Model Unet x4 (MSE+GRAD) with 1 Residual block (trained on 4 year data and normalized with mean_labels, std_labels = 290.6703, 12.1124): https://drive.google.com/file/d/1jdiIKQhZ1Na0K5E5apf9fa8SmdHK4akT/view?usp=sharing
