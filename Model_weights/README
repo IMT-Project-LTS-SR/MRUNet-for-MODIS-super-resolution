@@ -3,3 +3,8 @@ About the model input and output, before feeding an image into the model, you ne
 About SR Resnet, you can load it by: model = ResNet(12, 256).to(device)
 About model x4 U-Net with Residual blocks, when loading: model = UNet(n_resblocks=1,bilinear=0).to(device) with n_resblocks is the desired number of residual blocks in the architecture.
   When loading, remember to load like this: model.load_state_dict(torch.load('modelUNet+ResBlocks_x4_Yflip_gradmse_padReflect.pth')['model_state_dict'])
+I have trained a model which is similar to the one above ('modelUNet+ResBlocks_x4_Yflip_gradmse_padReflect.pth'), but with another normalization (I used mean_labels, std_labels = 290.6703, 12.1124) and I trained it with data of 4 years from 2017 to 2020 (roughly over 35k images)
+  How to use: 
+    model = UNet(res_down=False,n_resblocks=1,bilinear=0).to(device)
+    model.load_state_dict(torch.load('modelUNet+ResBlocks3_x4_Yflip_gradmse_4years.pth')['model_state_dict'])
+    model.eval()
