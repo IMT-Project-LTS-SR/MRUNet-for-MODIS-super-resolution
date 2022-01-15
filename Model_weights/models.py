@@ -244,3 +244,5 @@ if __name__ == '__main__':
 	# initialize the model
 	model = UNet(res_down=True, n_resblocks=1, bilinear=0).to(device)
 	summary(model, input_size=(1,64,64))
+	model.load_state_dict(torch.load('modelResUNet+ResBlocksVer5_1_x4_Yflip_gradmse_4years.pth')['model_state_dict'])
+	model.eval()
