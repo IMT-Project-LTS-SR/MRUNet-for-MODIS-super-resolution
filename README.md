@@ -2,7 +2,11 @@
 # Convolutional Neural Network Modelling for MODIS Land Surface Temperature Super-Resolution
 
 ## 0. Requirements
-pymodis, pymp
+
+```
+pip install pyModis
+pip install pymp-pypi
+```
 
 ## 1. Data downloading and database preparation
 User should firstly register on NASA's website[https://urs.earthdata.nasa.gov/users/new]. 
