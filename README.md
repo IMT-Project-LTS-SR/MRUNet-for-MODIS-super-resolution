@@ -27,7 +27,7 @@ python modis_data_preprocessing.py --year_begin <year_begin> --year_end <year_en
 
 ## 2. Train and test Multi residual U-net
 
-Our principle contribution in this project is to design and implement a new deep learning model based on U-net architecture called \bf{Multi-residual U-net}.
+Our principle contribution in this project is to design and implement a new deep learning model based on U-net architecture called **Multi-residual U-net**.
 
 ## 3. Result
 
@@ -39,13 +39,13 @@ Qualitative results:
 
 Quantitative results:
 
-| Method                 | PSNR    | SSIM | RMSE |
-|:----------------------:|:-------:|:----:|:----:|
-|  Bicubic               |  23.91  | 0.61 | 0.69 |
-|  ATPRK                 |  21.59  | 0.61 | 0.90 |
-|  VDSR                  |  25.42  | 0.72 | 0.58 |
-|  DCMN                  |  25.05  | 0.71 | 0.61 |
-|  Multi-residual U-Net  |  28.40  | 0.85 | 0.39 | (ours)
+| Method                     | PSNR    | SSIM | RMSE |
+|:--------------------------:|:-------:|:----:|:----:|
+|  Bicubic                   |  23.91  | 0.61 | 0.69 |
+|  ATPRK                     |  21.59  | 0.61 | 0.90 |
+|  VDSR                      |  25.42  | 0.72 | 0.58 |
+|  DCMN                      |  25.05  | 0.71 | 0.61 |
+|  **Multi-residual U-Net**  |  28.40  | 0.85 | 0.39 | (ours)
 
 
 
