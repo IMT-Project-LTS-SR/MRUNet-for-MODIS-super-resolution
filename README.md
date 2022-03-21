@@ -25,7 +25,13 @@ After downloading the raw data for the desired years, data need to be pre-proces
 python modis_data_preprocessing.py --year_begin <year_begin> --year_end <year_end>
 ```
 
+## 2. Train and test Multi residual U-net
 
+## 3. Result
+
+Qualitative results:
+
+![Results](images/index_3800jet.eps)
 
 
 
