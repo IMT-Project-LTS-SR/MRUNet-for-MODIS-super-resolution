@@ -27,7 +27,11 @@ python modis_data_preprocessing.py --year_begin <year_begin> --year_end <year_en
 
 ## 2. Train and test Multi residual U-net
 
+Our principle contribution in this project is to design and implement a new deep learning model based on U-net architecture called \bf{Multi-residual U-net}.
+
 ## 3. Result
+
+To quantify the results, we employed some famous metrics in image super resolution: PSNR and SSIM. We also mentioned RMSE because it is meaningful in remote sensing.
 
 Qualitative results:
 
