@@ -33,23 +33,15 @@ Qualitative results:
 
 ![Results](images/index_3800jet.png)
 
-Quantitative result:
+Quantitative results:
 
-\begin{table}[!ht]
-    \centering
-    \resizebox{0.85\linewidth}{!}{
-    \begin{tabular}{|l|l|l|l|}
-    \hline
-        Method & PSNR & SSIM & RMSE \\ \hline \hline
-        Bicubic & 23.91 & 0.61 & 0.69 \\ 
-        ATPRK & 21.59 & 0.61 & 0.90\\  
-        VDSR & 25.42 & 0.72 & 0.58\\  
-        DCMN & 25.05 & 0.71 & 0.61\\
-        \bf{Multi-residual U-Net} & \bf{28.40} & \bf{0.85} & \bf{0.39} \\ \hline 
-    \end{tabular}}
-    \caption{Evaluation of several methods for LST image super-resolution with scale ratio $\times 4$. The bold numbers indicate the best performance. }
-    \label{tab:result}
-\end{table}
+| Method                 | PSNR    | SSIM | RMSE |
+|:----------------------:|:-------:|:----:|:----:|
+|  Bicubic               |  23.91  | 0.61 | 0.69 |
+|  ATPRK                 |  21.59  | 0.61 | 0.90 |
+|  VDSR                  |  25.42  | 0.72 | 0.58 |
+|  DCMN                  |  25.05  | 0.71 | 0.61 |
+|  Multi-residual U-Net  |  28.40  | 0.85 | 0.39 | (ours)
 
 
 
