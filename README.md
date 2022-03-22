@@ -29,7 +29,7 @@ python modis_data_preprocessing.py --year_begin <year_begin> --year_end <year_en
 
 Our principle contribution in this project is to design and implement a new deep learning model based on U-net architecture called **Multi-residual U-net**. The architecture of this model is shown as below:
 
-![MRUnet](images/unet_ushape_ver2_legends_annotated_final.pdf)
+![MRUnet](images/unet_ushape_ver2_legends_annotated_final-1.png)
 
 ## 3. Result
 
