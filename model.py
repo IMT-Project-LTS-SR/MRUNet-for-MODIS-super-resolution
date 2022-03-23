@@ -306,7 +306,7 @@ class ResnetBlock(nn.Module):
 
 class MRUNet(nn.Module):
     def __init__(self, n_channels=1, n_classes=1, res_down=False, n_resblocks=1, padding_type="reflect", norm_layer=nn.BatchNorm2d, use_dropout=False, use_bias=True, bilinear=False):
-        super(UNet, self).__init__()
+        super(MRUNet, self).__init__()
         self.n_channels = n_channels
         self.n_classes = n_classes
         self.bilinear = bilinear
