@@ -19,6 +19,8 @@ The example dataset can be found here: https://drive.google.com/file/d/1np-1OogR
 
 You need to put your dataset into **dataset** folder.
 
+## Run visualization
+
 After doing previous steps, you can run the notebook visualization_benchmark.ipynb to see the results.
 
 An example result:
