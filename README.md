@@ -51,6 +51,6 @@ Quantitative results:
 
 ## 4. Result visualization
 
-You can find the notebook as well as the instruction for the benchmarking visualization in the folder *Visulization benchmark*. The notebook provides functions to plot and benchmark several techniques mentioned in the paper.
+You can find the notebook as well as the instruction for the benchmarking visualization in the folder *Visualization benchmark*. The notebook provides functions to plot and benchmark several techniques mentioned in the paper.
 
 
