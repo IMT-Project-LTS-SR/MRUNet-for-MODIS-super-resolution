@@ -49,3 +49,8 @@ Quantitative results:
 |  DCMN                      |  25.05  | 0.71 | 0.61 |
 |  **Multi-residual U-Net**  |  28.40  | 0.85 | 0.39 | (ours)
 
+## 4. Result visualization
+
+You can find the notebook as well as the instruction for the benchmarking visualization in the folder *Visulization benchmark*. The notebook provides functions to plot and benchmark several techniques mentioned in the paper.
+
+
