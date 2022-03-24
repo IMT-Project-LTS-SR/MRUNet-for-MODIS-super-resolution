@@ -4,6 +4,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 from osgeo import gdal
 import skimage.measure
+import cv2
+from skimage.metrics import peak_signal_noise_ratio
+from skimage.metrics import structural_similarity as ssim_sk
 	
 def norm4_f2(a,axis):
 	# result = np.zeros((np.array(a.shape)/2).astype(int))
@@ -430,3 +433,60 @@ def crop_modis_MOD13A2(hdf_path, hdf_name, save_dir, save_dir_downsample_2, save
 
 			_ = save_tif_MOD13A2(save_path_downsample_2, red_downsample_2, NIR_downsample_2, MIR_downsample_2, cols2, rows2, projection, geotransform2s[i])
 			_ = save_tif_MOD13A2(save_path_downsample_4, red_downsample_4, NIR_downsample_4, MIR_downsample_4, cols2, rows2, projection, geotransform2s[i])
+			
+			
+def downsampling(img, scale):
+  down_img = np.zeros((int(img.shape[0]/scale), int(img.shape[1]/scale)))
+  for y in range(0, img.shape[0], scale):
+    for x in range(0, img.shape[1], scale):
+      window = img[y:y+scale, x:x+scale].reshape(-1)
+      if 0 not in window:
+        sum4 = np.sum(window**4)
+        norm4 = (sum4/(scale**2))**0.25
+      else:
+        norm4 = 0.0
+      down_img[int(y/scale), int(x/scale)] = norm4
+  
+  return down_img
+
+
+def upsampling(img, scale):
+  up_img = cv2.resize(img, (img.shape[0]*scale, img.shape[1]*scale), cv2.INTER_CUBIC)
+  return up_img
+
+
+def normalization(image, max_val):
+  nml_image = image/max_val
+  return nml_image
+  
+
+def psnr(label, outputs, max_val):
+    """
+    Compute Peak Signal to Noise Ratio (the higher the better).
+    PSNR = 20 * log10(MAXp) - 10 * log10(MSE).
+    https://en.wikipedia.org/wiki/Peak_signal-to-noise_ratio#Definition
+    First we need to convert torch tensors to NumPy operable.
+    """
+    label = label.cpu().detach().numpy()
+    outputs = outputs.cpu().detach().numpy()*max_val
+    psnr_batch = []
+    for i in range(label.shape[0]):
+      psnr_img = peak_signal_noise_ratio(label[i,0,:,:], outputs[i,0,:,:], data_range=label.max()-label.min())
+      psnr_batch.append(psnr_img)
+    return np.array(psnr_batch).mean()
+
+
+def ssim(label, outputs, max_val):
+    label = label.cpu().detach().numpy()
+    outputs = outputs.cpu().detach().numpy()*max_val
+    ssim_batch = []
+    for i in range(label.shape[0]):
+      ssim_img = ssim_sk(label[i,0,:,:], outputs[i,0,:,:], data_range=label.max()-label.min())
+      ssim_batch.append(ssim_img)
+    return np.array(ssim_batch).mean()
+
+
+def get_loss(disp, img):
+    # THE FINAL LOSS FUNCTION
+    mse_img = ((disp - img)**2).mean()
+    return mse_img
