@@ -65,7 +65,7 @@ Quantitative results:
 |  ATPRK                     |  21.59  | 0.61 | 0.90 |
 |  VDSR                      |  25.42  | 0.72 | 0.58 |
 |  DCMN                      |  25.05  | 0.71 | 0.61 |
-|  **Multi-residual U-Net**  |  28.40  | 0.85 | 0.39 | (ours)
+|  **Multi-residual U-Net**  |  **28.40**  | **0.85** | **0.39** | **(ours)**
 
 ## 4. Result visualization
 
