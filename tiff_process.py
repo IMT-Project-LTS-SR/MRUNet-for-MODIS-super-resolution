@@ -1,8 +1,7 @@
 import pymp
-from multiprocessing import Pool, cpu_count, Process
 import time
 import os
-from osgeo import gdal
+from utils import read_tif
 
 def tiff_process(data_path):
     count = 0
@@ -24,5 +23,5 @@ def tiff_process(data_path):
 
 
     end = time.time()
-    print(f"Process ended in {((end-start)/60):.3f} minutes")
+    print(f"Finished processing tif files in {((end-start)/60):.3f} minutes \n")
     return Y_day, Y_night
