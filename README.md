@@ -1,5 +1,7 @@
 
 # Convolutional Neural Network Modelling for MODIS Land Surface Temperature Super-Resolution
+This repository includes code implementation for the article:
+> [*Binh Minh Nguyen, Ganglin Tian, Minh-Triet Vo, Aurélie Michel, Thomas Corpetti, et al.*. **Convolutional Neural Network Modelling for MODIS Land Surface Temperature Super-Resolution. 2022**.](https://hal.archives-ouvertes.fr/hal-03580148)
 
 ## 0. Requirements
 
@@ -25,11 +27,27 @@ After downloading the raw data for the desired years, data need to be pre-proces
 python modis_data_preprocessing.py --year_begin <year_begin> --year_end <year_end>
 ```
 
-## 2. Train and test Multi residual U-net
+## 2. Train and test **Multi residual U-net**
 
 Our principle contribution in this project is to design and implement a new deep learning model based on U-net architecture called **Multi-residual U-net**. The architecture of this model is shown as below:
 
 ![MRUnet](images/unet_ushape_ver2_legends_annotated_final-1.png)
+
+### Train
+To train the network with your tif data, please make sure to put all of the data into a folder and run the following command:
+
+```
+python train.py --datapath <path/to/training/tifs/directory> --model_name <name of the model> --lr <learning rate> --epochs <number of epochs> --batch_size <size of batch> --continue_train <True/False>
+```
+*P/s: The checkpoint of training process lies in the same directory as the train.py*.
+
+### Test
+To run the inference of the pretrained network on your tif data, please make sure to put all of the data into a folder and run the following command:
+
+```
+python run_inference.py --datapath <path/to/testing/tifs/directory> --pretrained <path/to/pretrained/model.pth> --savepath <path/to/save/directory> --max_val <normalization factor>
+```
+*P/s: The max_val is the maximum pixel value of the data used for training the pretrained model*.
 
 ## 3. Result
 
