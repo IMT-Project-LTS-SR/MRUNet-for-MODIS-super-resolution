@@ -6,8 +6,7 @@ This repository includes code implementation for the article:
 ## 0. Requirements
 
 ```
-pip install pyModis
-pip install pymp-pypi
+pip install requirements.txt
 ```
 
 ## 1. Data downloading and database preparation
