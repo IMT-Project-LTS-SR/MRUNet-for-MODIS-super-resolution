@@ -49,7 +49,7 @@ python run_inference.py --datapath <path/to/testing/tifs/directory> --pretrained
 ```
 *P/s:*
 1. The max_val is the maximum pixel value of the data used for training the pretrained model
-2. A pretrained Multi-residual U-Net can be found in [Visualization benchmark](Visualization benchmark)
+2. A pretrained Multi-residual U-Net can be found in [Visualization benchmark](Visualization benchmark/)
 
 ## 3. Result
 
