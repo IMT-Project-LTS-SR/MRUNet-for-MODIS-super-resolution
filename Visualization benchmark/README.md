@@ -28,7 +28,7 @@ You also need to format your dataset into an npy array with the size:
 (data_length, 2, 64, 64).
 Where data_length is the number of test data points. Each data points consists of two channels, index 0 represents NDVI and index 1 represents LST. Each channel has the size of 64 x 64 pixels.
 
-The example dataset can be found here: https://drive.google.com/file/d/1np-1OogR8q9coWb-wMdlsFk-Rk6h4ouD/view?usp=sharing.
+The example dataset can be found [here](https://drive.google.com/file/d/1np-1OogR8q9coWb-wMdlsFk-Rk6h4ouD/view?usp=sharing).
 
 You need to put your dataset into **dataset** folder.
 
