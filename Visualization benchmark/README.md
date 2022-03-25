@@ -1,6 +1,19 @@
 ## Benchmark visualization
 
-This folder provides the code to benchmark the methods mentioned in the paper. 
+This folder provides the code to benchmark the methods mentioned in the paper.
+
+<table>
+<tr><th>File description </th></tr>
+<tr><td>
+
+| File name | Description |
+|-----------|-------------|
+|modis_downloader.py|download MODIS LST image from NASA webpage (more information below)|
+|modis_data_preprocessing.py|preprocess the downloaded MODIS images, including cropping, cloud/sea elimination, etc.|
+|utils.py|contain all helper functions|
+|tiff_process.py|preprocess the tif files and transform them into npy arrays|
+
+</td></tr> </table>
 
 ## Requirement
 Before running the notebook, you first need to download the pre-trained models and put them in this folder using the following links:
