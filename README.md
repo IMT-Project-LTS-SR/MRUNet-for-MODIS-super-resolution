@@ -10,19 +10,20 @@ The brief description for each file is shown in the table below:
 <tr><td>
 
 | File name | Description |
-|--|--|
-|dataset.py|create Pytorch dataset object|
-|model.py|create Pytorch dataset object|
-|dataset.py|create Pytorch dataset object|
-|dataset.py|create Pytorch dataset object|
-|dataset.py|create Pytorch dataset object|
-|dataset.py|create Pytorch dataset object|
+|-----------|-------------|
+|modis_downloader.py|download MODIS LST image from NASA webpage (more information below)|
+|modis_data_preprocessing.py|preprocess the downloaded MODIS images, including cropping, cloud/sea elimination, etc.|
+|utils.py|contain all helper functions|
+|tiff_process.py|preprocess the tif files and transform them into npy arrays|
 
 </td><td>
 
-|b|1|
-|--|--|
-|a|s|
+| File name | Description |
+|-----------|-------------|
+|model.py|definition for Multi-residual U-Net model|
+|dataset.py|create Pytorch dataset object|
+|run_inference.py|run the trained network|
+|train.py|train the network|
 
 </td></tr> </table>
 
