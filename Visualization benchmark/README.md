@@ -22,7 +22,7 @@ VDSR: [here](https://drive.google.com/file/d/17OKkTVxhD4GSuSArA9bJ6Uq8WkRe1Sb1/v
 
 DMCN: [here](https://drive.google.com/file/d/12XNOszkNoZTM3aZPwu_LbdLd1HWESwL1/view?usp=sharing)
 
-Multi-residual Unet: [here](https://drive.google.com/file/d/1-BCc0-kj07p5FK4GbV_dzLb_0XEuKe6b/view?usp=sharing)
+Multi-residual U-Net: [here](https://drive.google.com/file/d/1-BCc0-kj07p5FK4GbV_dzLb_0XEuKe6b/view?usp=sharing)
 
 You also need to format your dataset into an npy array with the size: 
 (data_length, 2, 64, 64).
