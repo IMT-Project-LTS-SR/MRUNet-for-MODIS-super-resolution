@@ -8,21 +8,7 @@ This repository includes code implementation for the article:
 ```
 pip install requirements.txt
 ```
-<table>
-<tr><th>Table 1 Heading 1 </th><th>Table 1 Heading 2</th></tr>
-<tr><td>
 
-|Table 1| Middle | Table 2|
-|--|--|--|
-|a| not b|and c |
-
-</td><td>
-
-|b|1|2|3| 
-|--|--|--|--|
-|a|s|d|f|
-
-</td></tr> </table>
 ## 1. Data downloading and database preparation
 User should firstly register on NASA's website[https://urs.earthdata.nasa.gov/users/new]. 
 User could use the following command to download automatically MODIS dataset with the user name and corresponding password, the downloaded data will be placed folder "MODIS" in current directory.
