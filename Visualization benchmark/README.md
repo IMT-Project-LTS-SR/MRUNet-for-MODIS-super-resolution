@@ -8,10 +8,10 @@ This folder provides the code to benchmark the methods mentioned in the paper.
 
 | File name | Description |
 |-----------|-------------|
-|modis_downloader.py|download MODIS LST image from NASA webpage (more information below)|
-|modis_data_preprocessing.py|preprocess the downloaded MODIS images, including cropping, cloud/sea elimination, etc.|
-|utils.py|contain all helper functions|
-|tiff_process.py|preprocess the tif files and transform them into npy arrays|
+|Thunmpy|folder containing codes for ATPRK statistical super-resolution, please refer to [this Github repo by @cgranerob and @aumichel](https://github.com/cgranerob/ThUnmpy)|
+|ATPRK.py|ATPRK execution (to be deleted?)|
+|Visualization_benchmark.ipynb|notebook for running the visualization|
+|model.py and utils.py|(to be deleted?)|
 
 </td></tr> </table>
 
