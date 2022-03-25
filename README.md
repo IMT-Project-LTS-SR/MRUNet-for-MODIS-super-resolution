@@ -11,7 +11,7 @@ The brief description for each file is shown in the table below:
 
 | File name | Description |
 |--|--|
-| dataset.py | create Pytorch dataset object |
+|dataset.py|create Pytorch dataset object|
 
 </td><td>
 
