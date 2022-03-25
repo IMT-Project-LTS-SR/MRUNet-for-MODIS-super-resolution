@@ -18,11 +18,11 @@ This folder provides the code to benchmark the methods mentioned in the paper.
 ## Requirement
 Before running the notebook, you first need to download the pre-trained models and put them in this folder using the following links:
 
-VDSR: https://drive.google.com/file/d/17OKkTVxhD4GSuSArA9bJ6Uq8WkRe1Sb1/view?usp=sharing
+VDSR: [here](https://drive.google.com/file/d/17OKkTVxhD4GSuSArA9bJ6Uq8WkRe1Sb1/view?usp=sharing)
 
-DMCN: https://drive.google.com/file/d/12XNOszkNoZTM3aZPwu_LbdLd1HWESwL1/view?usp=sharing
+DMCN: [here](https://drive.google.com/file/d/12XNOszkNoZTM3aZPwu_LbdLd1HWESwL1/view?usp=sharing)
 
-Multi-residual Unet: https://drive.google.com/file/d/1-BCc0-kj07p5FK4GbV_dzLb_0XEuKe6b/view?usp=sharing
+Multi-residual Unet: [here](https://drive.google.com/file/d/1-BCc0-kj07p5FK4GbV_dzLb_0XEuKe6b/view?usp=sharing)
 
 You also need to format your dataset into an npy array with the size: 
 (data_length, 2, 64, 64).
