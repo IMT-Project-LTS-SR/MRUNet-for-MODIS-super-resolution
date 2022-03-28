@@ -9,9 +9,7 @@ This folder provides the code to benchmark the methods mentioned in the paper.
 | File name | Description |
 |-----------|-------------|
 |Thunmpy|folder containing codes for ATPRK statistical super-resolution, please refer to [this Github repo by @cgranerob and @aumichel](https://github.com/cgranerob/ThUnmpy)|
-|ATPRK.py|ATPRK execution (to be deleted?)|
 |Visualization_benchmark.ipynb|notebook for running the visualization|
-|model.py and utils.py|(to be deleted?)|
 
 </td></tr> </table>
 
@@ -22,7 +20,7 @@ VDSR: [here](https://drive.google.com/file/d/17OKkTVxhD4GSuSArA9bJ6Uq8WkRe1Sb1/v
 
 DMCN: [here](https://drive.google.com/file/d/12XNOszkNoZTM3aZPwu_LbdLd1HWESwL1/view?usp=sharing)
 
-Multi-residual U-Net: [here](https://drive.google.com/file/d/1-BCc0-kj07p5FK4GbV_dzLb_0XEuKe6b/view?usp=sharing)
+Multi-residual U-Net: [here](https://drive.google.com/file/d/1-BCc0-kj07p5FK4GbV_dzLb_0XEuKe6b/view?usp=sharing) or your trained model using MRUnet.
 
 You also need to format your dataset into an npy array with the size: 
 (data_length, 2, 64, 64).
