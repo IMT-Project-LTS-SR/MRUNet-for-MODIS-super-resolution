@@ -36,5 +36,5 @@ After doing previous steps, you can run the notebook visualization_benchmark.ipy
 
 An example result:
 
-![Example_result](Ilustration.png)
+![Example_result](Ilustration_image.png)
 
