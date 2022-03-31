@@ -30,7 +30,7 @@ The brief description for each file is shown in the table below:
 ## 0. Requirements
 
 ```
-pip install requirements.txt
+pip install -r requirements.txt
 ```
 
 ## 1. Data downloading and database preparation
