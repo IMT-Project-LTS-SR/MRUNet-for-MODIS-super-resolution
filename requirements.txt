@@ -8,7 +8,5 @@ scipy
 pyModis
 pymp-pypi
 opencv-python
-time
-os
 gdal
 skimage
