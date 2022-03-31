@@ -9,4 +9,4 @@ pyModis
 pymp-pypi
 opencv-python
 gdal
-skimage
+scikit-image
