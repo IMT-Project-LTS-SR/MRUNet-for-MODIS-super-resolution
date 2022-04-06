@@ -50,9 +50,9 @@ After downloading the raw data for the desired years, data need to be pre-proces
 python modis_data_preprocessing.py --year_begin <year_begin> --year_end <year_end>
 ```
 
-## 2. Train and test **Multi residual U-net**
+## 2. Train and test **Multi-residual U-Net**
 
-Our principle contribution in this project is to design and implement a new deep learning model based on U-net architecture called **Multi-residual U-net**. The architecture of this model is shown as below:
+Our principle contribution in this project is to design and implement a new deep learning model based on U-net architecture called **Multi-residual U-Net**. The architecture of this model is shown as below:
 
 ![MRUnet](images/unet_ushape_ver2_legends_annotated_final-1.png)
 
