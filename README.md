@@ -1,6 +1,6 @@
 
 # Convolutional Neural Network Modelling for MODIS Land Surface Temperature Super-Resolution
-This repository includes code implementation for the article:
+This repository includes code implementation for our article:
 > [*Binh Minh Nguyen, Ganglin Tian, Minh-Triet Vo, Aurélie Michel, Thomas Corpetti, et al.*. **Convolutional Neural Network Modelling for MODIS Land Surface Temperature Super-Resolution. 2022**.](https://hal.archives-ouvertes.fr/hal-03580148)
 
 The brief description for each file is shown in the table below:
